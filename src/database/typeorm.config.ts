@@ -1,26 +1,28 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
-import { config } from 'dotenv';
+import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { Injectable } from "@nestjs/common";
 
-config({ path: join(process.cwd(), 'src', 'config', 'env', '.database.env') });
-const configService = new ConfigService();
+@Injectable()
+export class AppDataSource implements TypeOrmOptionsFactory {
+  constructor(private readonly configService: ConfigService) {}
 
-const dataSourceOptions: DataSourceOptions = {
-  type: 'postgres',
-  host: configService.get<string>('POSTGRES_HOST', 'localhost'),
-  port: configService.get<number>('POSTGRES_PORT', 5432),
-  username: configService.get<string>('POSTGRES_USERNAME', 'postgres'),
-  password: configService.get<string>('POSTGRES_PASSWORD', ''),
-  database: configService.get<string>('POSTGRES_DB', 'postgres'),
-  schema: 'public',
-  logging: true,
-  entities: [],
-  migrations: [
-    join(process.cwd(), 'src', 'database', 'migrations', '**', '*migration.ts'),
-  ],
-  migrationsRun: true,
-  migrationsTableName: 'migrations',
-};
-
-export const appDataSource = new DataSource(dataSourceOptions);
+  createTypeOrmOptions(): Promise<TypeOrmModuleOptions> | TypeOrmModuleOptions {
+    return {
+      type: 'postgres',
+      host: this.configService.get<string>('POSTGRES_HOST', 'localhost'),
+      port: this.configService.get<number>('POSTGRES_PORT', 5432),
+      username: this.configService.get<string>('POSTGRES_USERNAME', 'postgres'),
+      password: this.configService.get<string>('POSTGRES_PASSWORD', ''),
+      database: this.configService.get<string>('POSTGRES_DB', 'postgres'),
+      schema: 'public',
+      logging: true,
+      entities: [],
+      migrations: [
+        join(process.cwd(), 'src', 'database', 'migrations', '**', '*migration.ts'),
+      ],
+      migrationsRun: true,
+      migrationsTableName: 'migrations',
+    };
+  }
+}
