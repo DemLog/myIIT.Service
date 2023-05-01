@@ -55,9 +55,9 @@ export class Profile {
   @ApiProperty()
   avatar: string;
 
-  @Column({ name: 'type', default: ProfileType.User })
+  @Column({ name: 'profile_type', default: ProfileType.User })
   @ApiProperty({ enum: ProfileType, default: ProfileType.User })
-  type: ProfileType;
+  profileType: ProfileType;
 
   @OneToOne(() => User, (user) => user.profile)
   user: User;
