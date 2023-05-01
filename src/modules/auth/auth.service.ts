@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Auth } from "../../database/entities/auth.entity";
-import { Profile } from "../../database/entities/profile.entity";
-import MoodleService from "./utils/moodleService";
+import { User } from "../../database/entities/user.entity";
+import { User } from "../../database/entities/profile.entity";
+import MoodleService from "../../utils/moodleService";
 import { LoginDto } from "./dto/LoginDto";
 import { UserTokenDto } from "./dto/UserTokenDto";
 import { JwtService } from "@nestjs/jwt";
@@ -11,16 +11,16 @@ import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(Auth)
-    private authRepository: Repository<Auth>,
-    @InjectRepository(Profile)
-    private profileRepository: Repository<Profile>,
+    @InjectRepository(User)
+    private authRepository: Repository<User>,
+    @InjectRepository(User)
+    private profileRepository: Repository<User>,
     private jwtService: JwtService
   ) {
   }
 
   async authenticate(loginDto: LoginDto): Promise<UserTokenDto | null> {
-    let user: Auth = await this.validateUser(loginDto);
+    let user: User = await this.validateUser(loginDto);
 
     if (!user) {
       const moodleService = new MoodleService(loginDto.login, loginDto.password);
@@ -49,7 +49,7 @@ export class AuthService {
     return this.generateUserToken(user);
   }
 
-  private async validateUser(loginDto: LoginDto): Promise<Auth | null> {
+  private async validateUser(loginDto: LoginDto): Promise<User | null> {
     const user = await this.authRepository.findOne({ where: { login: loginDto.login } });
     if (!user) {
       return null;
@@ -81,7 +81,7 @@ export class AuthService {
     return user;
   }
 
-  private generateUserToken(authData: Auth): UserTokenDto {
+  private generateUserToken(authData: User): UserTokenDto {
     const payload = { sub: authData.id };
     const token = this.jwtService.sign(payload);
 

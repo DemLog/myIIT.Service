@@ -1,6 +1,6 @@
 interface IUserProfileMoodle {
-  firstName: string | null;
-  lastName: string | null;
+  firstName: string;
+  lastName: string;
   patronymic: string;
   email: string;
   country: string;
