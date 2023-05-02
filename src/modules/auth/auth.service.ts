@@ -1,94 +1,72 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { ProfileService } from "../profile/profile.service";
+import { SessionService } from "../session/session.service";
+import { LoginDto } from "./dto/LoginDto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "../../database/entities/user.entity";
-import { User } from "../../database/entities/profile.entity";
 import MoodleService from "../../utils/moodleService";
-import { LoginDto } from "./dto/LoginDto";
-import { UserTokenDto } from "./dto/UserTokenDto";
-import { JwtService } from "@nestjs/jwt";
+import { ProfileType } from "../../common/enums/profile-type.enum";
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private authRepository: Repository<User>,
-    @InjectRepository(User)
-    private profileRepository: Repository<User>,
-    private jwtService: JwtService
-  ) {
-  }
+    private readonly userRepository: Repository<User>,
+    private readonly profileService: ProfileService,
+    private readonly sessionService: SessionService,
+  ) {}
 
-  async authenticate(loginDto: LoginDto): Promise<UserTokenDto | null> {
-    let user: User = await this.validateUser(loginDto);
+  async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<any> {
+    const moodleService = new MoodleService(loginDto.login, loginDto.password);
+    const moodleUser = await moodleService.checkAccount();
+
+    let user = await this.checkUser(loginDto.login);
 
     if (!user) {
-      const moodleService = new MoodleService(loginDto.login, loginDto.password);
-      const moodleUser = await moodleService.checkAccount();
-
-      const newAuthUser = await this.authRepository.save(
-        this.authRepository.create({
-          login: loginDto.login,
-          password: "",
-          moodleConsent: false
-        })
-      );
-      await this.authRepository.save(newAuthUser);
-      user = newAuthUser;
-
-      const newProfileUser = await this.profileRepository.save(
-        this.profileRepository.create({
-          ...moodleUser,
-          avatar: "",
-          auth: newAuthUser
-        })
-      );
-      await this.profileRepository.save(newProfileUser);
+      const createProfile = await this.profileService.create({
+        ...moodleUser,
+        profileType: ProfileType.User
+      });
+      const createUser = this.userRepository.create({
+        login: loginDto.login,
+        password: null,
+        profile: createProfile
+      });
+      await this.userRepository.save(createUser);
+      user = createUser;
     }
 
-    return this.generateUserToken(user);
+    const token = await this.sessionService.createSession({
+      deviceInfo: userAgent,
+      ipAddress,
+      profileId: user.profile.id,
+    });
+
+    return { token, moodleConsent: user.moodleConsent, userId: user.id };
   }
 
-  private async validateUser(loginDto: LoginDto): Promise<User | null> {
-    const user = await this.authRepository.findOne({ where: { login: loginDto.login } });
-    if (!user) {
-      return null;
+  async savePassword(login: string, password: string): Promise<void> {
+    const moodleService = new MoodleService(login, password);
+    const moodleUser = await moodleService.checkAccount();
+
+    if (!moodleUser) {
+      throw new HttpException('Invalid Moodle credentials', HttpStatus.BAD_REQUEST);
     }
 
-    if (!user.moodleConsent) {
-      try {
-        const moodleService = new MoodleService(loginDto.login, loginDto.password);
-        const moodleUser = await moodleService.checkAccount();
+    const user = await this.checkUser(login);
 
-        // обновляем профиль пользователя
-        await this.profileRepository.update(user.id, moodleUser);
-
-      } catch (e) {
-        throw new HttpException(
-          "Неправильный логин или пароль.",
-          HttpStatus.BAD_REQUEST
-        );
-      }
-    } else {
-      if (user.password !== loginDto.password) {
-        throw new HttpException(
-          "Неправильный логин или пароль.",
-          HttpStatus.BAD_REQUEST
-        );
-      }
+    if (user.password) {
+      throw new HttpException('Password already saved', HttpStatus.BAD_REQUEST);
     }
 
-    return user;
+    await this.userRepository.update(user.id, {
+      password,
+      moodleConsent: true
+    })
   }
 
-  private generateUserToken(authData: User): UserTokenDto {
-    const payload = { sub: authData.id };
-    const token = this.jwtService.sign(payload);
-
-    return {
-      token,
-      user_id: authData.id,
-      moodleConsent: authData.moodleConsent
-    };
+  private async checkUser(login: string): Promise<User | null> {
+    return this.userRepository.findOne({where: {login}});
   }
 }
