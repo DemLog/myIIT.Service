@@ -6,19 +6,19 @@ import { RolePermission } from './role-permission.entity';
 @Entity({ name: 'role' })
 export class Role {
   @PrimaryGeneratedColumn()
-  @ApiProperty()
+  @ApiProperty({ description: 'Уникальный идентификатор роли' })
   id: number;
 
   @Column({ name: 'name' })
-  @ApiProperty()
+  @ApiProperty({ description: 'Название роли' })
   name: string;
 
   @Column({ name: 'description' })
-  @ApiProperty()
+  @ApiProperty({ description: 'Описание роли' })
   description: string;
 
   @ManyToMany(() => Profile, (profile) => profile.roles)
-  users: Profile[];
+  profiles: Profile[];
 
   @ManyToMany(() => RolePermission, (permission) => permission.roles)
   permissions: RolePermission[];

@@ -1,26 +1,31 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm";
-import { ApiProperty } from "@nestjs/swagger";
-import { Profile } from "./profile.entity";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+import { Profile } from './profile.entity';
 
-@Entity({ name: "session" })
+@Entity({ name: 'session' })
 export class Session {
+  // Уникальный идентификатор сессии
   @PrimaryGeneratedColumn()
-  @ApiProperty()
+  @ApiProperty({ description: 'Уникальный идентификатор сессии' })
   id: number;
 
-  @Column({ name: "device_info" })
-  @ApiProperty()
+  // Информация об устройстве, на котором происходит сессия
+  @Column({ name: 'device_info' })
+  @ApiProperty({ description: 'Информация об устройстве, на котором происходит сессия' })
   deviceInfo: string;
 
-  @Column({ name: "ip_address" })
-  @ApiProperty()
+  // IP-адрес, с которого происходит сессия
+  @Column({ name: 'ip_address' })
+  @ApiProperty({ description: 'IP-адрес, с которого происходит сессия' })
   ipAddress: string;
 
-  @Column({ name: "jwt_token" })
-  @ApiProperty()
-  jwtToken: string;
+  // JWT-токен, используемый для аутентификации сессии
+  @Column({ name: 'token' })
+  @ApiProperty({ description: 'JWT-токен, используемый для аутентификации сессии' })
+  token: string;
 
-  @ManyToOne(() => Profile, (profile) => profile.sessions)
-  @ApiProperty()
+  // Профиль пользователя, связанный с сессией
+  @ManyToOne(() => Profile, (profile) => profile.sessions, { onDelete: 'CASCADE' })
+  @ApiProperty({ type: () => Profile, description: 'Профиль пользователя, связанный с сессией' })
   profile: Profile;
 }

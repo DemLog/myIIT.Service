@@ -7,8 +7,16 @@ import { ProfileModule } from "../profile/profile.module";
 import { SessionModule } from "../session/session.module";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), ProfileModule, SessionModule],
-  providers: [AuthService],
-  controllers: [AuthController],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    ProfileModule,
+    SessionModule,
+  ],
+  providers: [
+    AuthService,
+  ],
+  controllers: [
+    AuthController,
+  ],
 })
 export class AuthModule {}

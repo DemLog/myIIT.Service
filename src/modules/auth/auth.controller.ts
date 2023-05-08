@@ -1,26 +1,32 @@
-import { Body, Controller, Ip, Post, Req } from '@nestjs/common';
-import { LoginDto } from './dto/LoginDto';
-import { AuthService } from './auth.service';
+import { Body, Controller, Ip, Post, Req } from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { LoginDto } from "./dto/login.dto";
+import { AuthService } from "./auth.service";
+import { ResponseLoginDto } from "./dto/response-login.dto";
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'Аутентификация пользователя' })
+  @ApiBearerAuth()
   async login(
     @Body() loginDto: LoginDto,
     @Ip() ipAddress: string,
     @Req() req: Request,
-  ): Promise<any> {
+  ): Promise<ResponseLoginDto> {
     const userAgent = req.headers['user-agent'];
-    return this.authService.login(loginDto, ipAddress, userAgent);
+    return await this.authService.login(loginDto, ipAddress, userAgent);
   }
 
-  @Post('password')
+  @Post('login/save')
+  @ApiOperation({ summary: 'Сохранение пароля пользователя' })
+  @ApiBearerAuth()
   async savePassword(
-    @Body('login') login: string,
-    @Body('password') password: string,
+    @Body() loginDto: LoginDto,
   ): Promise<void> {
-    await this.authService.savePassword(login, password);
+    await this.authService.savePassword(loginDto);
   }
 }

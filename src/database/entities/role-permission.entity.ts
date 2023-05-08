@@ -5,15 +5,15 @@ import { Role } from './role.entity';
 @Entity({ name: 'role_permission' })
 export class RolePermission {
   @PrimaryGeneratedColumn()
-  @ApiProperty()
+  @ApiProperty({ description: 'Идентификатор разрешения роли' })
   id: number;
 
   @Column({ name: 'name' })
-  @ApiProperty()
+  @ApiProperty({ description: 'Название разрешения роли' })
   name: string;
 
   @Column({ name: 'description' })
-  @ApiProperty()
+  @ApiProperty({ description: 'Описание разрешения роли' })
   description: string;
 
   @ManyToMany(() => Role, (role) => role.permissions)

@@ -3,7 +3,7 @@ import { join } from 'path';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const envFilePath = join(process.cwd(), 'src', 'config', 'env', '.env.development');
-const envConfig = config({ path: envFilePath });
+config({ path: envFilePath });
 
 const options = (): DataSourceOptions => {
   const host = process.env.POSTGRES_HOST;

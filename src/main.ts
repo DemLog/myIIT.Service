@@ -10,10 +10,14 @@ async function bootstrap() {
     .setDescription('Документация REST API')
     .setVersion('1.0.0')
     .addBearerAuth()
-    .build()
+    .build();
   const documentSwagger = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('/docs', app, documentSwagger);
 
-  await app.listen(3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, () => {
+    console.log(`App listening on port ${port}`);
+  });
 }
+
 bootstrap();

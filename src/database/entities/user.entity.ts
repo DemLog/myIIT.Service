@@ -1,33 +1,27 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn
-} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Profile } from "./profile.entity";
 
 @Entity({ name: "user" })
 export class User {
-  @ApiProperty()
   @PrimaryGeneratedColumn({ name: "id" })
+  @ApiProperty({ description: 'Уникальный идентификатор пользователя' })
   id: number;
 
-  @ApiProperty()
   @Column({ name: "login", unique: true })
+  @ApiProperty({ description: 'Логин пользователя' })
   login: string;
 
-  @ApiProperty()
   @Column({ name: "password", select: false, nullable: true })
+  @ApiProperty({ description: 'Хеш пароля пользователя' })
   password: string;
 
-  @ApiProperty()
   @Column({ name: "moodle_consent", default: false })
+  @ApiProperty({ description: 'Согласие на хранение пароля в базе' })
   moodleConsent: boolean;
 
-  @ApiProperty({ type: () => Profile })
-  @OneToOne(() => Profile, (profile) => profile.user)
+  @OneToOne(() => Profile, (profile) => profile.user, { onDelete: 'CASCADE' })
   @JoinColumn({ name: "profile_id" })
+  @ApiProperty({ description: 'Профиль пользователя', type: () => Profile })
   profile: Profile;
 }

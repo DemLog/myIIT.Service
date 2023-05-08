@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { Profile } from "../../database/entities/profile.entity";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
-import { SearchProfileDto } from "./dto/search-profile.dto";
+import { ResponseProfileDto } from "./dto/response-profile.dto";
 
 @Injectable()
 export class ProfileService {
@@ -13,11 +13,11 @@ export class ProfileService {
     private readonly profileRepository: Repository<Profile>
   ) {}
 
-  async findAll(): Promise<Profile[]> {
+  async findAll(): Promise<ResponseProfileDto[]> {
     return this.profileRepository.find();
   }
 
-  async findOne(id: number): Promise<Profile> {
+  async findOne(id: number): Promise<ResponseProfileDto> {
     const profile = await this.profileRepository.findOne({ where: { id } });
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
@@ -30,7 +30,7 @@ export class ProfileService {
     return this.profileRepository.save(profile);
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto): Promise<Profile> {
+  async update(id: number, updateProfileDto: UpdateProfileDto): Promise<ResponseProfileDto> {
     const profile = await this.profileRepository.findOne({ where: { id } });
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
@@ -47,10 +47,10 @@ export class ProfileService {
     await this.profileRepository.remove(profile);
   }
 
-  async search(searchProfileDto: SearchProfileDto): Promise<Profile[]> {
+  async search(nameQuery: string): Promise<ResponseProfileDto[]> {
     return await this.profileRepository
       .createQueryBuilder("profile")
-      .where("profile.firstName LIKE :name OR profile.lastName LIKE :name", { name: `%${searchProfileDto.name}%` })
+      .where("profile.firstName LIKE :name OR profile.lastName LIKE :name", { name: `%${nameQuery}%` })
       .getMany();
   }
 }

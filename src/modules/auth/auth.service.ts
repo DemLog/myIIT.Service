@@ -1,12 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileService } from "../profile/profile.service";
 import { SessionService } from "../session/session.service";
-import { LoginDto } from "./dto/LoginDto";
+import { LoginDto } from "./dto/login.dto";
+import { User } from "../../database/entities/user.entity";
+import { ProfileType } from "../../common/enums/profileType.enum";
+import axios from "axios";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "../../database/entities/user.entity";
-import MoodleService from "../../utils/moodleService";
-import { ProfileType } from "../../common/enums/profile-type.enum";
+import { ResponseLoginDto } from "./dto/response-login.dto";
+import { CreateProfileDto } from "../profile/dto/create-profile.dto";
 
 @Injectable()
 export class AuthService {
@@ -14,59 +16,71 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly profileService: ProfileService,
-    private readonly sessionService: SessionService,
-  ) {}
+    private readonly sessionService: SessionService
+  ) {
+  }
 
-  async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<any> {
-    const moodleService = new MoodleService(loginDto.login, loginDto.password);
-    const moodleUser = await moodleService.checkAccount();
-
-    let user = await this.checkUser(loginDto.login);
+  async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<ResponseLoginDto> {
+    const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
+    let user = await this.findUserByLogin(loginDto.login);
 
     if (!user) {
-      const createProfile = await this.profileService.create({
-        ...moodleUser,
+      const userProfile: CreateProfileDto = {
+        ...moodleUserProfile,
         profileType: ProfileType.User
-      });
+      };
+
+      const createUserProfile = await this.profileService.create(userProfile);
+
       const createUser = this.userRepository.create({
         login: loginDto.login,
         password: null,
-        profile: createProfile
+        profile: createUserProfile
       });
       await this.userRepository.save(createUser);
+
       user = createUser;
     }
 
-    const token = await this.sessionService.createSession({
+    const session = await this.sessionService.createSession({
       deviceInfo: userAgent,
       ipAddress,
-      profileId: user.profile.id,
+      profileId: user.profile.id
     });
 
-    return { token, moodleConsent: user.moodleConsent, userId: user.id };
+    return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
   }
 
-  async savePassword(login: string, password: string): Promise<void> {
-    const moodleService = new MoodleService(login, password);
-    const moodleUser = await moodleService.checkAccount();
+  async savePassword(loginDto: LoginDto): Promise<void> {
+    await this.fetchMoodleUserProfile(loginDto);
 
-    if (!moodleUser) {
-      throw new HttpException('Invalid Moodle credentials', HttpStatus.BAD_REQUEST);
-    }
-
-    const user = await this.checkUser(login);
-
+    const user = await this.findUserByLogin(loginDto.login);
     if (user.password) {
-      throw new HttpException('Password already saved', HttpStatus.BAD_REQUEST);
+      throw new HttpException("Пароль уже сохранен в системе", HttpStatus.BAD_REQUEST);
     }
 
     await this.userRepository.update(user.id, {
-      password,
+      password: loginDto.password,
       moodleConsent: true
-    })
+    });
   }
 
-  private async checkUser(login: string): Promise<User | null> {
-    return this.userRepository.findOne({where: {login}});
+  private async fetchMoodleUserProfile(loginDto: LoginDto): Promise<IUserProfileMoodle> {
+    const url = "http://127.0.0.1:5000/";
+    const params = { username: loginDto.login, password: loginDto.password };
+
+    try {
+      const response = await axios.get(url, { params });
+      if (response?.data?.error_message) {
+        throw new HttpException(response.data.error_message, HttpStatus.BAD_REQUEST);
+      }
+      return response.data as IUserProfileMoodle;
+    } catch (error) {
+      throw new HttpException("Ошибка при взаимодействии с Moodle IIT", HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  private async findUserByLogin(login: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { login }, relations: ["profile"] });
   }
 }
