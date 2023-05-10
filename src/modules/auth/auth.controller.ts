@@ -3,12 +3,14 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
 import { ResponseLoginDto } from "./dto/response-login.dto";
+import { Public } from "../../common/decorators/public.decorator";
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Аутентификация пользователя' })
   @ApiBearerAuth()
@@ -21,6 +23,7 @@ export class AuthController {
     return await this.authService.login(loginDto, ipAddress, userAgent);
   }
 
+  @Public()
   @Post('login/save')
   @ApiOperation({ summary: 'Сохранение пароля пользователя' })
   @ApiBearerAuth()

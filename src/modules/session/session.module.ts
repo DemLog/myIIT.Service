@@ -5,18 +5,23 @@ import { Session } from '../../database/entities/session.entity';
 import { SessionController } from './session.controller';
 import { SessionService } from './session.service';
 import { ProfileModule } from "../profile/profile.module";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Session]),
-    JwtModule.register({
-      secret: "fdgfdgnhgftgfhbgf",
-      signOptions: { expiresIn: '1y' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET_KEY'),
+        signOptions: { expiresIn: '1y' },
+      }),
+      inject: [ConfigService],
     }),
     ProfileModule
   ],
   controllers: [SessionController],
   providers: [SessionService],
-  exports: [SessionService]
+  exports: [SessionService, JwtModule]
 })
 export class SessionModule {}

@@ -6,9 +6,10 @@ import { SessionModule } from "./modules/session/session.module";
 import { RoleModule } from "./modules/role/role.module";
 import { ProfileModule } from "./modules/profile/profile.module";
 import { join } from "path";
-import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 import { ResponseExceptionFilter } from "./common/filters/response-exception.filter";
+import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { ResponseExceptionFilter } from "./common/filters/response-exception.fil
     {
       provide: APP_FILTER,
       useClass: ResponseExceptionFilter
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
     }
   ]
 })
