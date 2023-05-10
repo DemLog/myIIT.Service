@@ -21,8 +21,18 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<ResponseLoginDto> {
-    const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
     let user = await this.findUserByLogin(loginDto.login);
+    if (user && user.moodleConsent && loginDto.password === user.password) {
+      const session = await this.sessionService.createSession({
+        deviceInfo: userAgent,
+        ipAddress,
+        profileId: user.profile.id
+      });
+
+      return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
+    }
+
+    const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
 
     if (!user) {
       const userProfile: CreateProfileDto = {
