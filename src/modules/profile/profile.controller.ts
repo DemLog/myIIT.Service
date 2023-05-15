@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiQuery, ApiBearerAuth } from "@nestjs/swagger";
 import { ProfileService } from './profile.service';
 import { Profile } from '../../database/entities/profile.entity';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -7,6 +7,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ResponseProfileDto } from "./dto/response-profile.dto";
 
 @ApiTags('profiles')
+@ApiBearerAuth()
 @Controller('profiles')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinTable } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from './profile.entity';
 
@@ -26,6 +26,7 @@ export class Session {
 
   // Профиль пользователя, связанный с сессией
   @ManyToOne(() => Profile, (profile) => profile.sessions, { onDelete: 'CASCADE' })
+  @JoinTable({ name: 'session_profile' })
   @ApiProperty({ type: () => Profile, description: 'Профиль пользователя, связанный с сессией' })
   profile: Profile;
 }

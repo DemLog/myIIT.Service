@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, Post, Query } from "@nestjs/common";
-import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { SessionService } from "./session.service";
 
 @ApiTags('sessions')
+@ApiBearerAuth()
 @Controller('sessions')
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}

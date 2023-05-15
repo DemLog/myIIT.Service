@@ -14,15 +14,21 @@ export class ProfileService {
   ) {}
 
   async findAll(): Promise<ResponseProfileDto[]> {
-    return this.profileRepository.find();
+    return this.profileRepository.find({relations: ['roles']});
   }
 
   async findOne(id: number): Promise<ResponseProfileDto> {
-    const profile = await this.profileRepository.findOne({ where: { id } });
+    const profile = await this.profileRepository.findOne({ where: { id }, relations: ['roles'] });
+    console.log(profile);
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
     }
-    return profile;
+    const roleList = profile.roles ? profile.roles.map((role) => ({ id: role.id, name: role.name, description: role.description })) : [];
+    return { ...profile, roles: roleList };
+  }
+
+  async getProfile(id: number): Promise<Profile> {
+    return await this.profileRepository.findOneOrFail({ where: { id } });
   }
 
   async create(createProfileDto: CreateProfileDto): Promise<Profile> {
@@ -31,7 +37,7 @@ export class ProfileService {
   }
 
   async update(id: number, updateProfileDto: UpdateProfileDto): Promise<ResponseProfileDto> {
-    const profile = await this.profileRepository.findOne({ where: { id } });
+    const profile = await this.profileRepository.findOne({ where: { id }, relations: ['roles'] });
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
     }
@@ -50,6 +56,7 @@ export class ProfileService {
   async search(nameQuery: string): Promise<ResponseProfileDto[]> {
     return await this.profileRepository
       .createQueryBuilder("profile")
+      .leftJoinAndSelect("profile.roles", "role")
       .where("profile.firstName LIKE :name OR profile.lastName LIKE :name", { name: `%${nameQuery}%` })
       .getMany();
   }

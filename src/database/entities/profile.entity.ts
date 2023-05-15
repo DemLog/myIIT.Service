@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinTable } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileType } from "../../common/enums/profileType.enum";
 import { Session } from "./session.entity";
@@ -67,8 +67,10 @@ export class Profile {
   user: User;
 
   @OneToMany(() => Session, (session) => session.profile)
+  @JoinTable({ name: 'session_profile' })
   sessions: Session[];
 
   @OneToMany(() => Role, (role) => role.profiles)
+  @JoinTable({ name: 'role_profile' })
   roles: Role[];
 }
