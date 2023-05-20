@@ -26,7 +26,6 @@ export class Session {
 
   // Профиль пользователя, связанный с сессией
   @ManyToOne(() => Profile, (profile) => profile.sessions, { onDelete: 'CASCADE' })
-  @JoinTable({ name: 'session_profile' })
   @ApiProperty({ type: () => Profile, description: 'Профиль пользователя, связанный с сессией' })
   profile: Profile;
 }

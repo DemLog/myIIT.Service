@@ -3,17 +3,29 @@ import {
   ExecutionContext,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
 } from "@nestjs/common";
-import { Observable } from "rxjs";
+import {CACHE_MANAGER} from "@nestjs/cache-manager";
+import {Cache} from "cache-manager";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
+import { Profile } from "../../database/entities/profile.entity";
+import { ProfileService } from "../../modules/profile/profile.service";
+import { Role } from "../../database/entities/role.entity";
+import { SessionService } from "../../modules/session/session.service";
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private readonly reflector: Reflector) {}
+  constructor(
+    private jwtService: JwtService,
+    private readonly profileService: ProfileService,
+    private readonly reflector: Reflector,
+    private readonly sessionService: SessionService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     // Проверяем, помечен ли метод декоратором @Public
     const isPublic = this.reflector.get<boolean>('isPublic', context.getHandler());
     if (isPublic) {
@@ -32,11 +44,31 @@ export class JwtAuthGuard implements CanActivate {
         throw new HttpException("Пользователь не авторизован", HttpStatus.UNAUTHORIZED)
       }
 
-      // Проверяем токен и добавляем информацию о пользователе в запрос
-      request.user = this.jwtService.verify(token);
+      const sessionExists = await this.sessionService.checkSession(token);
+      if (!sessionExists) {
+        throw new HttpException("Пользователь не авторизован", HttpStatus.UNAUTHORIZED);
+      }
+
+      const decodedToken = this.jwtService.decode(token) as { exp: number; profileId: number };
+      const profileId = decodedToken.profileId;
+
+      if (decodedToken.exp <= Math.floor(Date.now() / 1000)) {
+        await this.sessionService.removeSessionByToken(token);
+        throw new HttpException("Время сеанса истекло", HttpStatus.UNAUTHORIZED);
+      }
+
+      let profile: Profile = await this.cacheManager.get<Profile>(`profile:${profileId}`);
+      let permissions: string[] = await this.cacheManager.get<string[]>(`profile_permissions:${profileId}`);
+      if (!profile || !permissions) {
+        profile = await this.profileService.getProfile(profileId);
+        permissions = profile.roles.flatMap((role: Role) => role.permissions.map((permission) => permission.name));
+        await this.cacheManager.set(`profile_permissions:${profileId}`, permissions);
+      }
+      request.user = profile;
+      request.permissions = permissions;
+
       return true;
     } catch (e) {
-      // Если что-то пошло не так, выбрасываем исключение HttpException
       throw new HttpException("Пользователь не авторизован", HttpStatus.UNAUTHORIZED)
     }
   }

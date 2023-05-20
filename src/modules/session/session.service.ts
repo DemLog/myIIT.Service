@@ -25,11 +25,24 @@ export class SessionService {
     const session = this.sessionRepository.create({ deviceInfo, ipAddress, token: token, profile });
     await this.sessionRepository.save(session);
 
-    return {token, deviceInfo, ipAddress, profileId};
+    return { token, deviceInfo, ipAddress, profileId };
+  }
+
+  async getSession(id: number): Promise<Session> {
+    const session = await this.sessionRepository.findOne({ where: { id } });
+    if (!session) {
+      throw new HttpException("Сессия не найдена", HttpStatus.NOT_FOUND);
+    }
+    return session;
   }
 
   async removeSession(sessionId: number): Promise<void> {
-    const session = await this.sessionRepository.findOne({ where: { id: sessionId } });
+    const session = await this.getSession(sessionId);
+    await this.sessionRepository.remove(session);
+  }
+
+  async removeSessionByToken(token: string): Promise<void> {
+    const session = await this.sessionRepository.findOneBy({token});
     if (!session) {
       throw new HttpException("Сессия не найдена", HttpStatus.NOT_FOUND);
     }
@@ -38,8 +51,7 @@ export class SessionService {
 
   async checkSession(token: string): Promise<boolean> {
     try {
-      const decoded = this.jwtService.verify(token);
-      const session = await this.sessionRepository.findOne(decoded.sessionId);
+      const session = await this.sessionRepository.findOneBy({ token });
       return !!session;
     } catch (e) {
       return false;
@@ -51,13 +63,16 @@ export class SessionService {
   }
 
   async getAllSessions(profileId: number): Promise<SessionDto[]> {
-    const sessions = await this.sessionRepository.find({ where: { profile: { id: profileId }}, relations: ['profile'] });
+    const sessions = await this.sessionRepository.find({
+      where: { profile: { id: profileId } },
+      relations: { profile: true }
+    });
     return sessions.map(({ id, deviceInfo, ipAddress, profile }) => {
       return {
         id,
         deviceInfo,
         ipAddress,
-        profileId: profile.id,
+        profileId: profile.id
       };
     });
   }

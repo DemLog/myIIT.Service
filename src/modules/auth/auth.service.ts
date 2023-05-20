@@ -76,7 +76,7 @@ export class AuthService {
   }
 
   async getUser(id: number): Promise<User> {
-    return await this.userRepository.findOneOrFail({where: {id}});
+    return await this.userRepository.findOne({where: {id}, relations: {profile: true}});
   }
 
   private async fetchMoodleUserProfile(loginDto: LoginDto): Promise<IUserProfileMoodle> {
@@ -95,6 +95,6 @@ export class AuthService {
   }
 
   private async findUserByLogin(login: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { login }, relations: ["profile"] });
+    return this.userRepository.findOne({ where: { login }, relations: {profile: true}});
   }
 }

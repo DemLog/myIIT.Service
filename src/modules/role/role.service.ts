@@ -3,7 +3,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Role } from "../../database/entities/role.entity";
 import { Repository } from "typeorm";
 import { RolePermission } from "../../database/entities/role-permission.entity";
-import { ProfileService } from "../profile/profile.service";
 import { CreateRolePermissionDto } from "./dto/create-role-permission.dto";
 import { RolePermissionDto } from "./dto/role-permission.dto";
 import { RoleDto } from "./dto/role.dto";
@@ -18,26 +17,25 @@ export class RoleService {
     private roleRepository: Repository<Role>,
     @InjectRepository(RolePermission)
     private rolePermissionRepository: Repository<RolePermission>,
-    private readonly profileService: ProfileService
   ) {
   }
 
   // Методы по работе с ролевыми привелегиями
-  async createRolePermission(createRolePermissionDto: CreateRolePermissionDto): Promise<RolePermissionDto> {
-    const rolePermission = this.rolePermissionRepository.create(createRolePermissionDto);
-    return this.rolePermissionRepository.save(rolePermission);
-  }
-
   async getRolePermission(id: number): Promise<RolePermission> {
-    return await this.rolePermissionRepository.findOneOrFail({where: {id}});
-  }
-
-  async findRolePermissionById(id: number): Promise<RolePermissionDto> {
     const rolePermission = this.rolePermissionRepository.findOne({ where: { id } });
     if (!rolePermission) {
       throw new HttpException("Привелегия не найдена", HttpStatus.NOT_FOUND);
     }
     return rolePermission;
+  }
+
+  async createRolePermission(createRolePermissionDto: CreateRolePermissionDto): Promise<RolePermissionDto> {
+    const rolePermission = this.rolePermissionRepository.create(createRolePermissionDto);
+    return this.rolePermissionRepository.save(rolePermission);
+  }
+
+  async findRolePermissionById(id: number): Promise<RolePermissionDto> {
+    return this.getRolePermission(id);
   }
 
   async findRolePermissionByName(name: string): Promise<RolePermissionDto> {
@@ -63,15 +61,15 @@ export class RoleService {
   }
 
   async getRole(id: number): Promise<Role> {
-    return await this.roleRepository.findOneOrFail({where: {id}, relations: ["permissions"]});
-  }
-
-  async findRoleById(id: number): Promise<RoleDto> {
-    const role = await this.getRole(id);
+    const role = await this.roleRepository.findOne({where: {id}, relations: {permissions: true}});
     if (!role) {
       throw new HttpException("Роль не найдена", HttpStatus.NOT_FOUND);
     }
     return role;
+  }
+
+  async findRoleById(id: number): Promise<RoleDto> {
+    return await this.getRole(id);
   }
 
   async findRoleByName(name: string): Promise<RoleDto> {
@@ -97,34 +95,9 @@ export class RoleService {
     return this.roleRepository.save(role);
   }
 
-  async addProfileToRole(roleId: number, profileId: number): Promise<void> {
-    const role = await this.roleRepository.findOne({ where: { id: roleId }, relations: ["profiles"] });
-    if (!role) {
-      throw new HttpException("Роль не найдена", HttpStatus.NOT_FOUND);
-    }
-    const profile = await this.profileService.getProfile(profileId);
-
-    role.profiles.push(profile);
-    profile.roles.push(role);
-    await this.roleRepository.save(role);
-    await this.profileService.update(profileId, profile);
-  }
-
   async removeRolePermissionFromRole(roleId: number, removePermissionsRoleDto: PermissionsRoleIdDto): Promise<RoleDto> {
     const role = await this.getRole(roleId);
     role.permissions = role.permissions.filter(p => !removePermissionsRoleDto.permissionsId.includes(p.id));
     return this.roleRepository.save(role);
-  }
-
-  async removeProfileFromRole(roleId: number, profileId: number): Promise<void> {
-    const role = await this.getRole(roleId);
-    if (!role) {
-      throw new HttpException("Роль не найдена", HttpStatus.NOT_FOUND);
-    }
-    const profile = await this.profileService.getProfile(profileId);
-    role.profiles = role.profiles.filter((p) => p.id !== profileId);
-    profile.roles = profile.roles.filter((r) => r.id !== roleId);
-    await this.roleRepository.save(role);
-    await this.profileService.update(profileId, profile);
   }
 }

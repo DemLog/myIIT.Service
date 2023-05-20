@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinTable } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  OneToMany,
+  JoinTable,
+  ManyToMany,
+  JoinColumn
+} from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileType } from "../../common/enums/profileType.enum";
 import { Session } from "./session.entity";
@@ -66,11 +75,11 @@ export class Profile {
   @OneToOne(() => User, (user) => user.profile)
   user: User;
 
-  @OneToMany(() => Session, (session) => session.profile)
-  @JoinTable({ name: 'session_profile' })
+  @OneToMany(() => Session, (session) => session.profile, { onDelete: 'CASCADE' })
+  @JoinColumn()
   sessions: Session[];
 
-  @OneToMany(() => Role, (role) => role.profiles)
-  @JoinTable({ name: 'role_profile' })
+  @ManyToMany(() => Role, (role) => role.profiles, {cascade: true})
+  @JoinTable()
   roles: Role[];
 }
