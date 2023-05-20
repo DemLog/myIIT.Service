@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -7,6 +7,8 @@ import { Session } from "../../database/entities/session.entity";
 import { ProfileService } from "../profile/profile.service";
 import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
 import { SessionDto } from "./dto/session.dto";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class SessionService {
@@ -14,7 +16,8 @@ export class SessionService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly profileService: ProfileService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {
   }
 
@@ -46,6 +49,7 @@ export class SessionService {
     if (!session) {
       throw new HttpException("Сессия не найдена", HttpStatus.NOT_FOUND);
     }
+    await this.cacheManager.del(`session:${session.profile.id}`);
     await this.sessionRepository.remove(session);
   }
 
