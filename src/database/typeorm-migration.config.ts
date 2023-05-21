@@ -22,8 +22,8 @@ const options = (): DataSourceOptions => {
     username: user,
     password,
     schema: 'public',
-    entities: [join(process.cwd(), "dist", "database", "entities", "**", "*.entity.js")],
-    migrations: [join(process.cwd(), "dist", "database", "migrations", "*migration.js")],
+    entities: [join(process.cwd(), "src", "database", "entities", "**", "*.entity.ts")],
+    migrations: [join(process.cwd(), "src", "database", "migrations", "*.migration.ts")],
     migrationsTableName: "migrations",
     migrationsRun: true,
     logging: true

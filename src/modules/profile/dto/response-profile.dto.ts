@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from "class-validator";
+import { RoleListDto } from "../../role/dto/role-list.dto";
 
 export class ResponseProfileDto {
   @ApiProperty({ example: '1', description: 'Индентификатор профиля пользователя' })
@@ -37,4 +37,7 @@ export class ResponseProfileDto {
 
   @ApiProperty({ example: 'https://example.com/avatar.jpg', description: 'URL адрес аватара пользователя' })
   avatar?: string;
+
+  @ApiProperty({ type: [RoleListDto], description: 'Список ролей пользователя' })
+  roles: RoleListDto[];
 }

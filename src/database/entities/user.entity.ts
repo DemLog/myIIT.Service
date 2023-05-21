@@ -12,7 +12,7 @@ export class User {
   @ApiProperty({ description: 'Логин пользователя' })
   login: string;
 
-  @Column({ name: "password", select: false, nullable: true })
+  @Column({ name: "password", nullable: true })
   @ApiProperty({ description: 'Хеш пароля пользователя' })
   password: string;
 
@@ -21,7 +21,7 @@ export class User {
   moodleConsent: boolean;
 
   @OneToOne(() => Profile, (profile) => profile.user, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: "profile_id" })
+  @JoinColumn()
   @ApiProperty({ description: 'Профиль пользователя', type: () => Profile })
   profile: Profile;
 }

@@ -1,14 +1,18 @@
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "./database/database.module";
 import { AuthModule } from "./modules/auth/auth.module";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { SessionModule } from "./modules/session/session.module";
 import { RoleModule } from "./modules/role/role.module";
 import { ProfileModule } from "./modules/profile/profile.module";
 import { join } from "path";
-import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from "@nestjs/core";
 import { ResponseInterceptor } from "./common/interceptors/response.interceptor";
 import { ResponseExceptionFilter } from "./common/filters/response-exception.filter";
+import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
+import { CacheModule } from "@nestjs/cache-manager";
+import { redisStore } from "cache-manager-redis-yet";
+import { RolesGuard } from "./common/guards/roles.guard";
 
 @Module({
   imports: [
@@ -20,6 +24,17 @@ import { ResponseExceptionFilter } from "./common/filters/response-exception.fil
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: join(process.cwd(), "src", "config", "env", ".env.development")
+    }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        store: await redisStore({
+          url: `redis://${configService.get<string>("REDIS_HOST")}:${configService.get<number>("REDIS_PORT")}`,
+          ttl: 1000 * 60 * 2
+        })
+      }),
+      inject: [ConfigService],
+      isGlobal: true
     })
   ],
   controllers: [],
@@ -31,8 +46,16 @@ import { ResponseExceptionFilter } from "./common/filters/response-exception.fil
     {
       provide: APP_FILTER,
       useClass: ResponseExceptionFilter
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
     }
-  ]
+  ],
 })
 export class AppModule {
 }

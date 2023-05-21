@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinTable, ManyToMany } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from './profile.entity';
 import { RolePermission } from './role-permission.entity';
@@ -21,5 +21,6 @@ export class Role {
   profiles: Profile[];
 
   @ManyToMany(() => RolePermission, (permission) => permission.roles)
+  @JoinTable()
   permissions: RolePermission[];
 }

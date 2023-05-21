@@ -21,8 +21,18 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<ResponseLoginDto> {
-    const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
     let user = await this.findUserByLogin(loginDto.login);
+    if (user && user.moodleConsent && loginDto.password === user.password) {
+      const session = await this.sessionService.createSession({
+        deviceInfo: userAgent,
+        ipAddress,
+        profileId: user.profile.id
+      });
+
+      return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
+    }
+
+    const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
 
     if (!user) {
       const userProfile: CreateProfileDto = {
@@ -65,6 +75,10 @@ export class AuthService {
     });
   }
 
+  async getUser(id: number): Promise<User> {
+    return await this.userRepository.findOne({where: {id}, relations: {profile: true}});
+  }
+
   private async fetchMoodleUserProfile(loginDto: LoginDto): Promise<IUserProfileMoodle> {
     const url = "http://127.0.0.1:5000/";
     const params = { username: loginDto.login, password: loginDto.password };
@@ -81,6 +95,6 @@ export class AuthService {
   }
 
   private async findUserByLogin(login: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { login }, relations: ["profile"] });
+    return this.userRepository.findOne({ where: { login }, relations: {profile: true}});
   }
 }

@@ -3,15 +3,18 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
 import { ResponseLoginDto } from "./dto/response-login.dto";
+import { Public } from "../../common/decorators/public.decorator";
+import { Permissions } from "../../common/decorators/permissions.decorator";
+import { Permission } from "../../common/enums/permission.enum";
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Аутентификация пользователя' })
-  @ApiBearerAuth()
   async login(
     @Body() loginDto: LoginDto,
     @Ip() ipAddress: string,
@@ -21,9 +24,10 @@ export class AuthController {
     return await this.authService.login(loginDto, ipAddress, userAgent);
   }
 
+  @ApiBearerAuth()
+  @Permissions(Permission.AUTH_CREATE)
   @Post('login/save')
   @ApiOperation({ summary: 'Сохранение пароля пользователя' })
-  @ApiBearerAuth()
   async savePassword(
     @Body() loginDto: LoginDto,
   ): Promise<void> {
