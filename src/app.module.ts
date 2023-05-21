@@ -13,6 +13,7 @@ import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-yet";
 import { RolesGuard } from "./common/guards/roles.guard";
+import { TimetableModule } from './modules/timetable/timetable.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { RolesGuard } from "./common/guards/roles.guard";
       }),
       inject: [ConfigService],
       isGlobal: true
-    })
+    }),
+    TimetableModule
   ],
   controllers: [],
   providers: [
