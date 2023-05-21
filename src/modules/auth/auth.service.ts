@@ -9,6 +9,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { CreateProfileDto } from "../profile/dto/create-profile.dto";
+import { RoleService } from "../role/role.service";
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,8 @@ export class AuthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly profileService: ProfileService,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
+    private readonly roleService: RoleService
   ) {
   }
 
@@ -41,6 +43,8 @@ export class AuthService {
       };
 
       const createUserProfile = await this.profileService.create(userProfile);
+      const userRole = await this.roleService.findRoleByName("Пользователь");
+      await this.profileService.addProfileToRole(createUserProfile.id, { roleId: userRole.id });
 
       const createUser = this.userRepository.create({
         login: loginDto.login,

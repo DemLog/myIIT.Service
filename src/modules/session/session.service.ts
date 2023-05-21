@@ -41,6 +41,7 @@ export class SessionService {
 
   async removeSession(sessionId: number): Promise<void> {
     const session = await this.getSession(sessionId);
+    await this.cacheManager.del(`session:${session.profile.id}`);
     await this.sessionRepository.remove(session);
   }
 
