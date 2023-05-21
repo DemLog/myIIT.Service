@@ -1,9 +1,11 @@
 import { Body, Controller, Ip, Post, Req } from "@nestjs/common";
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { LoginDto } from "./dto/login.dto";
 import { AuthService } from "./auth.service";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { Public } from "../../common/decorators/public.decorator";
+import { Permissions } from "../../common/decorators/permissions.decorator";
+import { Permission } from "../../common/enums/permission.enum";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -22,7 +24,8 @@ export class AuthController {
     return await this.authService.login(loginDto, ipAddress, userAgent);
   }
 
-  @Public()
+  @ApiBearerAuth()
+  @Permissions(Permission.AUTH_CREATE)
   @Post('login/save')
   @ApiOperation({ summary: 'Сохранение пароля пользователя' })
   async savePassword(

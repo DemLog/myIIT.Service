@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Role } from "../../database/entities/role.entity";
 import { Repository } from "typeorm";
@@ -9,6 +9,8 @@ import { RoleDto } from "./dto/role.dto";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { PermissionsRoleIdDto } from "./dto/permissions-role-id.dto";
 import { RoleListDto } from "./dto/role-list.dto";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class RoleService {
@@ -17,6 +19,7 @@ export class RoleService {
     private roleRepository: Repository<Role>,
     @InjectRepository(RolePermission)
     private rolePermissionRepository: Repository<RolePermission>,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {
   }
 
@@ -92,12 +95,20 @@ export class RoleService {
     const role = await this.getRole(roleId);
     const permission = await Promise.all(addPermissionsRoleDto.permissionsId.map(id => this.getRolePermission(id)));
     role.permissions.push(...permission);
+    await this.removeAllPermissionsCache();
     return this.roleRepository.save(role);
   }
 
   async removeRolePermissionFromRole(roleId: number, removePermissionsRoleDto: PermissionsRoleIdDto): Promise<RoleDto> {
     const role = await this.getRole(roleId);
     role.permissions = role.permissions.filter(p => !removePermissionsRoleDto.permissionsId.includes(p.id));
+    await this.removeAllPermissionsCache();
     return this.roleRepository.save(role);
+  }
+
+  private async removeAllPermissionsCache(): Promise<void> {
+    const keys = await this.cacheManager.store.keys();
+    const keysToDelete = keys.filter((key) => key.startsWith('profile_permissions:'));
+    await Promise.all(keysToDelete.map((key) => this.cacheManager.del(key)));
   }
 }

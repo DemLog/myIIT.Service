@@ -7,7 +7,7 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>('permissions', [context.getHandler(), context.getClass()]);
+    const requiredPermissions = this.reflector.getAllAndMerge<Permission[]>('permissions', [context.getClass(), context.getHandler()]);
 
     if (!requiredPermissions) {
       return true;
