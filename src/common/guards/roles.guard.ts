@@ -9,7 +9,7 @@ export class RolesGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> {
     const requiredPermissions = this.reflector.getAllAndMerge<Permission[]>('permissions', [context.getClass(), context.getHandler()]);
 
-    if (!requiredPermissions) {
+    if (requiredPermissions.length === 0) {
       return true;
     }
 

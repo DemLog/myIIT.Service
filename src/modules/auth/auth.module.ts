@@ -5,12 +5,14 @@ import { AuthController } from "./auth.controller";
 import { User } from "../../database/entities/user.entity";
 import { ProfileModule } from "../profile/profile.module";
 import { SessionModule } from "../session/session.module";
+import { RoleModule } from "../role/role.module";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     ProfileModule,
     SessionModule,
+    RoleModule
   ],
   providers: [
     AuthService,

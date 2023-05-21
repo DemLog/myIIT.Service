@@ -75,7 +75,7 @@ export class RoleService {
     return await this.getRole(id);
   }
 
-  async findRoleByName(name: string): Promise<RoleDto> {
+  async findRoleByName(name: string): Promise<Role> {
     const role = await this.roleRepository.findOneOrFail({where: {name}, relations: ["permissions"]});
     if (!role) {
       throw new HttpException("Роль не найдена", HttpStatus.NOT_FOUND);
