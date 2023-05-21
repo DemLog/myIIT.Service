@@ -30,7 +30,7 @@ export class ProfileService {
   }
 
   async getProfile(id: number): Promise<Profile> {
-    const profile = await this.profileRepository.findOneOrFail({ where: { id }, relations: {roles: {permissions: true}} });
+    const profile = await this.profileRepository.findOne({ where: { id }, relations: {roles: {permissions: true}} });
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
     }
