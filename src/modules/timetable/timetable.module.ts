@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TimetableController } from './timetable.controller';
-import { LecturerTimetableService } from "./services";
+import { LecturerModule } from "./modules/lecturer.module";
 
 @Module({
-  controllers: [TimetableController],
-  providers: [LecturerTimetableService],
-  exports: [LecturerTimetableService]
+  imports: [LecturerModule],
+  controllers: [],
+  providers: [],
+  exports: []
 })
 export class TimetableModule {}
