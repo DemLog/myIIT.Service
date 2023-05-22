@@ -5,14 +5,14 @@ import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { SessionService } from "./session.service";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { Permission } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/permission.enum";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Profile } from "../../database/entities/profile.entity";
 import { CurrentUserPermissions } from "../../common/decorators/current-user-permissions.decorator";
 
 @ApiTags("sessions")
 @ApiBearerAuth()
-@Permissions(Permission.SESSION_ALL)
+@Permissions(PermissionDefault.SESSION_ALL)
 @Controller("sessions")
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {
@@ -21,7 +21,7 @@ export class SessionController {
   @ApiOperation({ summary: "Создание сессии" })
   @ApiOkResponse({ type: ResponseCreateSessionDto })
   @ApiResponse({ status: 400, description: "Некорректные данные для создания сессии" })
-  @Permissions(Permission.SESSION_CREATE)
+  @Permissions(PermissionDefault.SESSION_CREATE)
   @Post()
   async createSession(@Body() createSessionDto: CreateSessionDto): Promise<ResponseCreateSessionDto> {
     return await this.sessionService.createSession(createSessionDto);
@@ -30,7 +30,7 @@ export class SessionController {
   @ApiOperation({ summary: "Удаление одной сессии" })
   @ApiResponse({ status: 200, description: "Сессия удалена" })
   @ApiResponse({ status: 404, description: "Сессия не найдена" })
-  @Permissions(Permission.SESSION_DELETE, Permission.SESSION_READ_UPDATE_DELETE)
+  @Permissions(PermissionDefault.SESSION_DELETE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
   @Post("logout")
   async removeSession(
     @Query("sessionId") sessionId: number,
@@ -38,7 +38,7 @@ export class SessionController {
     @CurrentUserPermissions() currentUserPermissions: string[]
   ): Promise<void> {
     const session = await this.sessionService.getSession(sessionId);
-    if (session.profile.id !== currentUser.id && !currentUserPermissions.includes(Permission.SESSION_ALL.toString())) {
+    if (session.profile.id !== currentUser.id && !currentUserPermissions.includes(PermissionDefault.SESSION_ALL.toString())) {
       throw new HttpException("Нет доступа на данную операцию", HttpStatus.FORBIDDEN);
     }
 
@@ -49,7 +49,7 @@ export class SessionController {
   @ApiResponse({ status: 200, description: "Все сессии пользователя удалены" })
   @ApiResponse({ status: 404, description: "Пользователь не найден" })
   @ApiQuery({name: "profileId", type: Number, required: false, allowEmptyValue: true})
-  @Permissions(Permission.SESSION_DELETE, Permission.SESSION_READ_UPDATE_DELETE)
+  @Permissions(PermissionDefault.SESSION_DELETE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
   @Delete()
   async removeAllSessions(
     @Query("profileId") profileId: number,
@@ -60,7 +60,7 @@ export class SessionController {
       profileId = currentUser.id;
     }
 
-    const hasFullAccess = currentUserPermissions.includes(Permission.SESSION_ALL.toString()) || currentUserPermissions.includes(Permission.PERMISSION_ALL.toString());
+    const hasFullAccess = currentUserPermissions.includes(PermissionDefault.SESSION_ALL.toString()) || currentUserPermissions.includes(PermissionDefault.PERMISSION_ALL.toString());
     if (profileId !== currentUser.id && !hasFullAccess) {
       throw new HttpException("Нет доступа на данную операцию", HttpStatus.FORBIDDEN);
     }
@@ -72,7 +72,7 @@ export class SessionController {
   @ApiResponse({ status: 200, type: SessionDto, isArray: true, description: "Список сессий пользователя" })
   @ApiResponse({ status: 404, description: "Пользователь не найден" })
   @ApiQuery({name: "profileId", type: Number, required: false, allowEmptyValue: true})
-  @Permissions(Permission.SESSION_READ, Permission.SESSION_READ_UPDATE, Permission.SESSION_READ_UPDATE_DELETE)
+  @Permissions(PermissionDefault.SESSION_READ, PermissionDefault.SESSION_READ_UPDATE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
   @Get()
   async getAllSessions(
     @Query("profileId") profileId: number,
@@ -83,7 +83,7 @@ export class SessionController {
       profileId = currentUser.id;
     }
 
-    const hasFullAccess = currentUserPermissions.includes(Permission.SESSION_ALL.toString()) || currentUserPermissions.includes(Permission.PERMISSION_ALL.toString());
+    const hasFullAccess = currentUserPermissions.includes(PermissionDefault.SESSION_ALL.toString()) || currentUserPermissions.includes(PermissionDefault.PERMISSION_ALL.toString());
     if (profileId !== currentUser.id && !hasFullAccess) {
       throw new HttpException("Нет доступа на данную операцию", HttpStatus.FORBIDDEN);
     }

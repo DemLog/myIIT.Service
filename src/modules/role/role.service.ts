@@ -11,6 +11,7 @@ import { PermissionsRoleIdDto } from "./dto/permissions-role-id.dto";
 import { RoleListDto } from "./dto/role-list.dto";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
+import { defaultStudyGroupPermissions } from "../../common/enums/permission.enum";
 
 @Injectable()
 export class RoleService {
@@ -110,5 +111,26 @@ export class RoleService {
     const keys = await this.cacheManager.store.keys();
     const keysToDelete = keys.filter((key) => key.startsWith('profile_permissions:'));
     await Promise.all(keysToDelete.map((key) => this.cacheManager.del(key)));
+  }
+
+  async createStudentRole(studyGroup: string): Promise<Role> {
+    let studentRole: Role;
+    try {
+      studentRole = await this.findRoleByName(studyGroup);
+    } catch (e) {
+      const role = this.roleRepository.create({
+        name: studyGroup,
+        description: `Учебная группа ${studyGroup}`
+      });
+      studentRole = await this.roleRepository.save(role);
+
+      for (const permission of defaultStudyGroupPermissions) {
+        const rolePermission = this.rolePermissionRepository.create({
+          name: permission.toString()
+        });
+        await this.rolePermissionRepository.save(rolePermission);
+      }
+    }
+    return studentRole;
   }
 }

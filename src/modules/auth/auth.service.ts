@@ -10,6 +10,7 @@ import { Repository } from "typeorm";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { CreateProfileDto } from "../profile/dto/create-profile.dto";
 import { RoleService } from "../role/role.service";
+import { Role } from "../../database/entities/role.entity";
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<ResponseLoginDto> {
     let user = await this.findUserByLogin(loginDto.login);
+
     if (user && user.moodleConsent && loginDto.password === user.password) {
       const session = await this.sessionService.createSession({
         deviceInfo: userAgent,
@@ -46,11 +48,24 @@ export class AuthService {
       const userRole = await this.roleService.findRoleByName("Пользователь");
       await this.profileService.addProfileToRole(createUserProfile.id, { roleId: userRole.id });
 
+      if (createUserProfile.studyGroup) {
+        let studentRole: Role;
+
+        try {
+          studentRole = await this.roleService.findRoleByName(createUserProfile.studyGroup);
+        } catch (e) {
+          studentRole = await this.roleService.createStudentRole(createUserProfile.studyGroup);
+        } finally {
+          await this.profileService.addProfileToRole(createUserProfile.id, { roleId: studentRole.id });
+        }
+      }
+
       const createUser = this.userRepository.create({
         login: loginDto.login,
         password: null,
         profile: createUserProfile
       });
+
       await this.userRepository.save(createUser);
 
       user = createUser;

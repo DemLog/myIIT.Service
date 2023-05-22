@@ -2,7 +2,6 @@ import { Controller, Get, HttpException, HttpStatus, Query } from "@nestjs/commo
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LessonScheduleService } from "./services";
 import { ResponseLessonScheduleDto } from "./dto/lessonSchedule/response-lesson-schedule.dto";
-import { RoleService } from "../role/role.service";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Profile } from "../../database/entities/profile.entity";
 

@@ -5,7 +5,7 @@ import { AuthService } from "./auth.service";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { Public } from "../../common/decorators/public.decorator";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { Permission } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/permission.enum";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -25,7 +25,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @Permissions(Permission.AUTH_CREATE)
+  @Permissions(PermissionDefault.AUTH_CREATE)
   @Post('login/save')
   @ApiOperation({ summary: 'Сохранение пароля пользователя' })
   async savePassword(
