@@ -8,7 +8,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagg
 @ApiTags('timetable/lecturer')
 @ApiBearerAuth()
 @Controller('timetable/lecturer')
-export class LecturerController {
+export class LecturerTimetableController {
   constructor(private readonly lecturerService: LecturerTimetableService) {}
 
   @ApiOperation({ summary: 'Создать преподавателя' })
