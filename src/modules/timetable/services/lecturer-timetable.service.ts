@@ -21,7 +21,7 @@ export class LecturerTimetableService {
   async getLecturer(id: number): Promise<Lecturer> {
     const lecturer = await this.lecturerRepository.findOne({where: {id}});
     if (!lecturer) {
-      throw new HttpException("преподаватель не найден", HttpStatus.NOT_FOUND);
+      throw new HttpException("Преподаватель не найден", HttpStatus.NOT_FOUND);
     }
     return lecturer;
   }
