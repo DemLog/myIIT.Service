@@ -21,7 +21,7 @@ export class LessonScheduleService {
   ) {
   }
 
-  private isEvenWeek(date: Date): boolean {
+  public isEvenWeek(date: Date): boolean {
     const START_DAY = new Date(2021, 7, 30); // August 30, 2021
     const numberOfWeeks = Math.floor((date.getTime() - START_DAY.getTime()) / (7 * 24 * 60 * 60 * 1000)) + 1;
     return numberOfWeeks % 2 === 0;
@@ -87,10 +87,10 @@ export class LessonScheduleService {
     return this.lessonScheduleRepository.save(lessonSchedule);
   }
 
-  async getTodayScheduleForGroup(userGroupId: number): Promise<ResponseLessonScheduleDto[]> {
+  async getTodayScheduleForGroup(userGroup: string): Promise<ResponseLessonScheduleDto[]> {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
     const isEvenWeek = this.isEvenWeek(new Date());
-    const group = await this.roleService.getRole(userGroupId);
+    const group = await this.roleService.findRoleByName(userGroup);
     const schedule = await this.lessonScheduleRepository.find({
       where: {
         groups: group,
@@ -107,8 +107,8 @@ export class LessonScheduleService {
     return schedule;
   }
 
-  async getWeeklyScheduleForGroup(userGroupId: number, isEvenWeek: boolean): Promise<ResponseLessonScheduleDto[]> {
-    const group = await this.roleService.getRole(userGroupId);
+  async getWeeklyScheduleForGroup(userGroup: string, isEvenWeek: boolean): Promise<ResponseLessonScheduleDto[]> {
+    const group = await this.roleService.findRoleByName(userGroup);
     return await this.lessonScheduleRepository.find({
       where: {
         groups: group,
