@@ -16,7 +16,7 @@ export class Subject {
   @ApiProperty({
     enum: SubjectType,
     default: SubjectType.Unknown,
-    description: 'Тип првоедения предмета'
+    description: 'Тип проведения предмета'
   })
   type: SubjectType;
 }
