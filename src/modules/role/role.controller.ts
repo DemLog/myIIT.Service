@@ -8,18 +8,18 @@ import { PermissionsRoleIdDto } from "./dto/permissions-role-id.dto";
 import { RolePermissionDto } from "./dto/role-permission.dto";
 import { RoleListDto } from "./dto/role-list.dto";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { Permission } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/permission.enum";
 
 @ApiTags('roles')
 @ApiBearerAuth()
-@Permissions(Permission.ROLE_ALL)
+@Permissions(PermissionDefault.ROLE_ALL)
 @Controller('roles')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @ApiOperation({ summary: 'Создать привелегию' })
   @ApiResponse({ status: 201, description: 'Успешно', type: RolePermissionDto })
-  @Permissions(Permission.ROLE_PERMISSION_CREATE)
+  @Permissions(PermissionDefault.ROLE_PERMISSION_CREATE)
   @Post('permissions')
   async createRolePermission(
     @Body() createRolePermissionDto: CreateRolePermissionDto): Promise<RolePermissionDto> {
@@ -29,9 +29,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Получить все привелегии' })
   @ApiResponse({ status: 200, description: 'Успешно', type: [RolePermissionDto] })
   @Permissions(
-    Permission.ROLE_PERMISSION_READ,
-    Permission.ROLE_PERMISSION_READ_UPDATE,
-    Permission.ROLE_PERMISSION_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_PERMISSION_READ,
+    PermissionDefault.ROLE_PERMISSION_READ_UPDATE,
+    PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
   @Get('permissions')
   async getAllRolePermissions(): Promise<RolePermissionDto[]> {
@@ -41,9 +41,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Получить привелегию по ID' })
   @ApiResponse({ status: 200, description: 'Успешно', type: RolePermissionDto })
   @Permissions(
-    Permission.ROLE_PERMISSION_READ,
-    Permission.ROLE_PERMISSION_READ_UPDATE,
-    Permission.ROLE_PERMISSION_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_PERMISSION_READ,
+    PermissionDefault.ROLE_PERMISSION_READ_UPDATE,
+    PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
   @Get('permissions/:id')
   async getRolePermissionById(@Param('id') id: number): Promise<RolePermissionDto> {
@@ -60,8 +60,8 @@ export class RoleController {
   @ApiOperation({ summary: 'Удалить привелегию' })
   @ApiResponse({ status: 204, description: 'Успешно', type: RolePermissionDto })
   @Permissions(
-    Permission.ROLE_PERMISSION_DELETE,
-    Permission.ROLE_PERMISSION_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_PERMISSION_DELETE,
+    PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
   @Delete('permissions/:id')
   async deleteRolePermission(@Param('id') id: number): Promise<void> {
@@ -71,9 +71,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Добавить права на роль' })
   @ApiResponse({ status: 200, description: 'Успешно', type: RoleDto })
   @Permissions(
-    Permission.ROLE_UPDATE,
-    Permission.ROLE_READ_UPDATE,
-    Permission.ROLE_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
   @Post(':id/permissions')
   async addRolePermission(
@@ -86,9 +86,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Удалить права из роли' })
   @ApiResponse({ status: 200, description: 'Успешно', type: RoleDto })
   @Permissions(
-    Permission.ROLE_UPDATE,
-    Permission.ROLE_READ_UPDATE,
-    Permission.ROLE_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
   @Delete(':id/permissions')
   async removeRolePermissionFromRole(
@@ -101,7 +101,7 @@ export class RoleController {
   @ApiOperation({ summary: 'Создать роль' })
   @ApiResponse({ status: 201, description: 'Роль успешно создана', type: RoleDto })
   @Permissions(
-    Permission.ROLE_CREATE
+    PermissionDefault.ROLE_CREATE
   )
   @Post()
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<RoleDto> {
@@ -111,9 +111,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Получить все роли' })
   @ApiResponse({ status: 200, description: 'Успешно', type: [RoleListDto] })
   @Permissions(
-    Permission.ROLE_READ,
-    Permission.ROLE_READ_UPDATE,
-    Permission.ROLE_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_READ,
+    PermissionDefault.ROLE_READ_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
   @Get()
   async getAllRoles(): Promise<RoleListDto[]> {
@@ -123,9 +123,9 @@ export class RoleController {
   @ApiOperation({ summary: 'Получить роль по ID' })
   @ApiResponse({ status: 200, description: 'Успешно', type: RoleDto })
   @Permissions(
-    Permission.ROLE_READ,
-    Permission.ROLE_READ_UPDATE,
-    Permission.ROLE_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_READ,
+    PermissionDefault.ROLE_READ_UPDATE,
+    PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
   @Get(':id')
   async getRoleById(@Param('id') id: number): Promise<RoleDto> {
@@ -142,8 +142,8 @@ export class RoleController {
   @ApiOperation({ summary: 'Удалить роль' })
   @ApiResponse({ status: 204, description: 'Роль успешно удалена' })
   @Permissions(
-    Permission.ROLE_DELETE,
-    Permission.ROLE_READ_UPDATE_DELETE,
+    PermissionDefault.ROLE_DELETE,
+    PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
   @Delete(':id')
   async deleteRole(@Param('id') id: number): Promise<void> {

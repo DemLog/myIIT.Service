@@ -1,4 +1,4 @@
 import { SetMetadata } from "@nestjs/common";
-import { Permission } from "../enums/permission.enum";
+import { PermissionDefault } from "../enums/permission.enum";
 
-export const Permissions = (...permissions: Permission[]) => SetMetadata('permissions', permissions);
+export const Permissions = (...permissions: PermissionDefault[]) => SetMetadata('permissions', permissions);

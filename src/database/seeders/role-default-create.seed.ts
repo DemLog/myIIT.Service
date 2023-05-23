@@ -1,15 +1,15 @@
 import { DataSource, In } from "typeorm";
-import { Permission } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/permission.enum";
 import { Role } from "../entities/role.entity";
 import { RolePermission } from "../entities/role-permission.entity";
 
-const defaultAdminPermissions = [Permission.PERMISSION_ALL];
+const defaultAdminPermissions = [PermissionDefault.PERMISSION_ALL];
 const defaultUserPermissions = [
-  Permission.AUTH_CREATE,
-  Permission.PROFILE_READ_UPDATE,
-  Permission.SESSION_READ_UPDATE_DELETE,
-  Permission.ROLE_READ,
-  Permission.ROLE_PERMISSION_READ
+  PermissionDefault.AUTH_CREATE,
+  PermissionDefault.PROFILE_READ_UPDATE,
+  PermissionDefault.SESSION_READ_UPDATE_DELETE,
+  PermissionDefault.ROLE_READ,
+  PermissionDefault.ROLE_PERMISSION_READ
 ];
 
 export default class RoleDefaultCreateSeed {
