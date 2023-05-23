@@ -3,7 +3,7 @@ import { SubjectTimetableService } from "../services";
 import { CreateSubjectDto } from "../dto/subject/create-subject.dto";
 import { ResponseSubjectDto } from "../dto/subject/response-subject.dto";
 import { UpdateSubjectDto } from "../dto/subject/update-subject.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('timetable/subject')
 @ApiBearerAuth()
@@ -13,6 +13,7 @@ export class SubjectTimetableController {
 
   @ApiOperation({ summary: 'Создать предмет' })
   @ApiResponse({ status: 201, description: 'Успешно', type: ResponseSubjectDto })
+  @ApiBody({type: CreateSubjectDto})
   @Post()
   async create(@Body() createSubjectDto: CreateSubjectDto): Promise<ResponseSubjectDto> {
     return this.subjectService.create(createSubjectDto);
@@ -34,6 +35,7 @@ export class SubjectTimetableController {
 
   @ApiOperation({ summary: 'Обновить предмет' })
   @ApiResponse({ status: 200, description: 'Успешно', type: ResponseSubjectDto })
+  @ApiBody({type: UpdateSubjectDto})
   @Put(':id')
   async update(
     @Param('id') id: number,

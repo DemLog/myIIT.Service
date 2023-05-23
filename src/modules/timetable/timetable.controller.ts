@@ -1,5 +1,5 @@
 import { Controller, Get, HttpException, HttpStatus, Query } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { LessonScheduleService } from "./services";
 import { ResponseLessonScheduleDto } from "./dto/lessonSchedule/response-lesson-schedule.dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
@@ -29,6 +29,7 @@ export class TimetableController {
 
   @ApiOperation({ summary: 'Получить расписание на сегодня для группы' })
   @ApiResponse({ status: 200, description: 'Успешно', type: [ResponseLessonScheduleDto] })
+  @ApiQuery({ name: "group", type: String, required: false, allowEmptyValue: true })
   @Get('today')
   async getTodayScheduleForGroup(
     @Query('group') groupName: string,
@@ -43,6 +44,8 @@ export class TimetableController {
 
   @ApiOperation({ summary: 'Получить недельное расписание для группы' })
   @ApiResponse({ status: 200, description: 'Успешно', type: [ResponseLessonScheduleDto] })
+  @ApiQuery({ name: "group", type: String, required: false, allowEmptyValue: true })
+  @ApiQuery({ name: "is-even-week", type: Boolean, required: false, allowEmptyValue: true })
   @Get('weekly')
   async getWeeklyScheduleForGroup(
     @Query('group') groupName: string,

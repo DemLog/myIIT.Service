@@ -3,7 +3,7 @@ import { TimeScheduleService } from "../services";
 import { CreateTimeScheduleDto } from "../dto/timeSchedule/create-time-schedule.dto";
 import { ResponseTimeScheduleDto } from "../dto/timeSchedule/response-time-schedule.dto";
 import { UpdateTimeScheduleDto } from "../dto/timeSchedule/update-time-schedule.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('timetable/time-schedule')
 @ApiBearerAuth()
@@ -13,6 +13,7 @@ export class TimeScheduleController {
 
   @ApiOperation({ summary: 'Создать расписание времени' })
   @ApiResponse({ status: 201, description: 'Успешно', type: ResponseTimeScheduleDto })
+  @ApiBody({type: CreateTimeScheduleDto})
   @Post()
   async create(@Body() createTimeScheduleDto: CreateTimeScheduleDto): Promise<ResponseTimeScheduleDto> {
     return this.timeScheduleService.create(createTimeScheduleDto);
@@ -34,6 +35,7 @@ export class TimeScheduleController {
 
   @ApiOperation({ summary: 'Обновить расписание времени' })
   @ApiResponse({ status: 200, description: 'Успешно', type: ResponseTimeScheduleDto })
+  @ApiBody({type: UpdateTimeScheduleDto})
   @Put(':id')
   async update(
     @Param('id') id: number,

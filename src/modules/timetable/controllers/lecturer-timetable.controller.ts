@@ -3,7 +3,7 @@ import { LecturerTimetableService } from "../services";
 import { CreateLecturerDto } from "../dto/lecturer/create-lecturer.dto";
 import { ResponseLecturerDto } from "../dto/lecturer/response-lecturer.dto";
 import { UpdateLecturerDto } from "../dto/lecturer/update-lecturer.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('timetable/lecturer')
 @ApiBearerAuth()
@@ -13,6 +13,7 @@ export class LecturerTimetableController {
 
   @ApiOperation({ summary: 'Создать преподавателя' })
   @ApiResponse({ status: 201, description: 'Успешно', type: ResponseLecturerDto })
+  @ApiBody({type: CreateLecturerDto})
   @Post()
   async create(@Body() createLecturerDto: CreateLecturerDto): Promise<ResponseLecturerDto> {
     return this.lecturerService.create(createLecturerDto);
@@ -34,6 +35,7 @@ export class LecturerTimetableController {
 
   @ApiOperation({ summary: 'Обновить преподавателя' })
   @ApiResponse({ status: 200, description: 'Успешно', type: ResponseLecturerDto })
+  @ApiBody({type: UpdateLecturerDto})
   @Put(':id')
   async update(
     @Param('id') id: number,

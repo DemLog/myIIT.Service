@@ -3,7 +3,7 @@ import { LessonScheduleService } from "../services";
 import { CreateLessonScheduleDto } from "../dto/lessonSchedule/create-lesson-schedule.dto";
 import { ResponseLessonScheduleDto } from "../dto/lessonSchedule/response-lesson-schedule.dto";
 import { UpdateLessonScheduleDto } from "../dto/lessonSchedule/update-lesson-schedule.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @ApiTags('timetable/lesson-schedule')
 @ApiBearerAuth()
@@ -13,6 +13,7 @@ export class LessonScheduleController {
 
   @ApiOperation({ summary: 'Создать расписание занятия' })
   @ApiResponse({ status: 201, description: 'Успешно', type: ResponseLessonScheduleDto })
+  @ApiBody({type: CreateLessonScheduleDto})
   @Post()
   async create(@Body() createLessonScheduleDto: CreateLessonScheduleDto): Promise<ResponseLessonScheduleDto> {
     return this.lessonScheduleService.create(createLessonScheduleDto);
@@ -34,6 +35,7 @@ export class LessonScheduleController {
 
   @ApiOperation({ summary: 'Обновить занятие' })
   @ApiResponse({ status: 200, description: 'Успешно', type: ResponseLessonScheduleDto })
+  @ApiBody({type: UpdateLessonScheduleDto})
   @Put(':id')
   async update(
     @Param('id') id: number,

@@ -58,7 +58,14 @@ export class LessonScheduleService {
   }
 
   async findAll(): Promise<ResponseLessonScheduleDto[]> {
-    return this.lessonScheduleRepository.find();
+    return this.lessonScheduleRepository.find({
+      relations: {
+        subject: true,
+        lecture: true,
+        time: true,
+        groups: true
+      }
+    });
   }
 
   async findOne(id: number): Promise<ResponseLessonScheduleDto> {
@@ -88,21 +95,21 @@ export class LessonScheduleService {
   }
 
   async getTodayScheduleForGroup(userGroup: string): Promise<ResponseLessonScheduleDto[]> {
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
     const isEvenWeek = this.isEvenWeek(new Date());
     const group = await this.roleService.findRoleByName(userGroup);
     const schedule = await this.lessonScheduleRepository.find({
       where: {
         groups: group,
         dayWeek: DayWeek[today],
-        isEvenWeek,
+        isEvenWeek
       },
       relations: {
         subject: true,
         groups: true,
         lecture: true,
         time: true
-      },
+      }
     });
     return schedule;
   }
@@ -112,14 +119,14 @@ export class LessonScheduleService {
     return await this.lessonScheduleRepository.find({
       where: {
         groups: group,
-        isEvenWeek,
+        isEvenWeek
       },
       relations: {
         subject: true,
         groups: true,
         lecture: true,
         time: true
-      },
+      }
     });
   }
 }
