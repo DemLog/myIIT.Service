@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { ProfileService } from "./profile.service";
-import { Profile } from "../../database/entities/profile.entity";
+import { Profile } from "../../database/entities/users/profile.entity";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ResponseProfileDto } from "./dto/response-profile.dto";

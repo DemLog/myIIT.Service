@@ -1,5 +1,5 @@
 import { Subject } from "./subject.entity";
-import { Role } from "../role.entity";
+import { Role } from "../users/role.entity";
 import { Lecturer } from "./lecturer.entity";
 import { DayWeek } from "../../../common/enums/dayWeek.enum";
 import { TimeSchedule } from "./time-schedule.entity";

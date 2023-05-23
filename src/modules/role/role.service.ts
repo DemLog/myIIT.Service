@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Role } from "../../database/entities/role.entity";
+import { Role } from "../../database/entities/users/role.entity";
 import { Repository } from "typeorm";
-import { RolePermission } from "../../database/entities/role-permission.entity";
+import { RolePermission } from "../../database/entities/users/role-permission.entity";
 import { CreateRolePermissionDto } from "./dto/create-role-permission.dto";
 import { RolePermissionDto } from "./dto/role-permission.dto";
 import { RoleDto } from "./dto/role.dto";

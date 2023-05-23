@@ -10,9 +10,9 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
 import { JwtService } from "@nestjs/jwt";
 import { Reflector } from "@nestjs/core";
-import { Profile } from "../../database/entities/profile.entity";
+import { Profile } from "../../database/entities/users/profile.entity";
 import { ProfileService } from "../../modules/profile/profile.service";
-import { Role } from "../../database/entities/role.entity";
+import { Role } from "../../database/entities/users/role.entity";
 import { SessionService } from "../../modules/session/session.service";
 
 @Injectable()

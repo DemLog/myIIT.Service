@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileService } from "../profile/profile.service";
 import { SessionService } from "../session/session.service";
 import { LoginDto } from "./dto/login.dto";
-import { User } from "../../database/entities/user.entity";
+import { User } from "../../database/entities/users/user.entity";
 import { ProfileType } from "../../common/enums/profileType.enum";
 import axios from "axios";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -10,7 +10,7 @@ import { Repository } from "typeorm";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { CreateProfileDto } from "../profile/dto/create-profile.dto";
 import { RoleService } from "../role/role.service";
-import { Role } from "../../database/entities/role.entity";
+import { Role } from "../../database/entities/users/role.entity";
 
 @Injectable()
 export class AuthService {

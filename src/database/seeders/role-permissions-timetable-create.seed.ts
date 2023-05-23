@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { RolePermission } from "../entities/role-permission.entity";
+import { RolePermission } from "../entities/users/role-permission.entity";
 import { PermissionTimeTable } from "../../common/enums/permission.enum";
 
 export default class RolePermissionsStudyCreateSeeder {

@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateSessionDto } from "./dto/create-session.dto";
-import { Session } from "../../database/entities/session.entity";
+import { Session } from "../../database/entities/users/session.entity";
 import { ProfileService } from "../profile/profile.service";
 import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
 import { SessionDto } from "./dto/session.dto";

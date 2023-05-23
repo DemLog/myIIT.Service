@@ -1,7 +1,7 @@
 import { DataSource, In } from "typeorm";
 import { PermissionDefault } from "../../common/enums/permission.enum";
-import { Role } from "../entities/role.entity";
-import { RolePermission } from "../entities/role-permission.entity";
+import { Role } from "../entities/users/role.entity";
+import { RolePermission } from "../entities/users/role-permission.entity";
 
 const defaultAdminPermissions = [PermissionDefault.PERMISSION_ALL];
 const defaultUserPermissions = [
