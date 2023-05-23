@@ -9,7 +9,7 @@ import {
   JoinColumn
 } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
-import { ProfileType } from "../../common/enums/profileType.enum";
+import { ProfileType } from "../../../common/enums/profileType.enum";
 import { Session } from "./session.entity";
 import { Role } from "./role.entity";
 import { User } from "./user.entity";

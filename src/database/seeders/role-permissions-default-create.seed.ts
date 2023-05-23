@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { PermissionDefault } from "../../common/enums/permission.enum";
-import { RolePermission } from "../entities/role-permission.entity";
+import { RolePermission } from "../entities/users/role-permission.entity";
 
 export default class RolePermissionsCreateSeeder {
   async run(dataSource: DataSource): Promise<void> {

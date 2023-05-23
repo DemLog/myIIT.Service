@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@ne
 import { LessonScheduleService } from "./services";
 import { ResponseLessonScheduleDto } from "./dto/lessonSchedule/response-lesson-schedule.dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
-import { Profile } from "../../database/entities/profile.entity";
+import { Profile } from "../../database/entities/users/profile.entity";
 
 const STUDENT_GROUPS = ["ПрИ", "БИ", "ПИ"];
 

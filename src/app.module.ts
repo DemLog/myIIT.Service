@@ -14,6 +14,7 @@ import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-yet";
 import { RolesGuard } from "./common/guards/roles.guard";
 import { TimetableModule } from './modules/timetable/timetable.module';
+import { NewsModule } from './modules/news/news.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { TimetableModule } from './modules/timetable/timetable.module';
       inject: [ConfigService],
       isGlobal: true
     }),
-    TimetableModule
+    TimetableModule,
+    NewsModule
   ],
   controllers: [],
   providers: [
