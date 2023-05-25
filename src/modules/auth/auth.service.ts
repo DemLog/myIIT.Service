@@ -3,7 +3,7 @@ import { ProfileService } from "../profile/profile.service";
 import { SessionService } from "../session/session.service";
 import { LoginDto } from "./dto/login.dto";
 import { User } from "../../database/entities/users/user.entity";
-import { ProfileType } from "../../common/enums/profileType.enum";
+import { ProfileType } from "../../common/enums/users/profileType.enum";
 import axios from "axios";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";

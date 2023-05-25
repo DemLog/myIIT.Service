@@ -5,7 +5,7 @@ import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
 import { SessionDto } from "./dto/session.dto";
 import { SessionService } from "./session.service";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Profile } from "../../database/entities/users/profile.entity";
 import { CurrentUserPermissions } from "../../common/decorators/current-user-permissions.decorator";

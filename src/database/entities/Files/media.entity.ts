@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne } from "typeorm";
-import { MediaType } from "../../../common/enums/mediaType.enum";
+import { MediaType } from "../../../common/enums/files/mediaType.enum";
 import { News } from "../news/news.entity";
 import { File } from "./file.entity";
 

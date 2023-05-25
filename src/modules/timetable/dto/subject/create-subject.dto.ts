@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SubjectType } from "../../../../common/enums/subjectType.enum";
+import { SubjectType } from "../../../../common/enums/timetable/subjectType.enum";
 
 export class CreateSubjectDto {
   @ApiProperty({description: "Название предмета"})

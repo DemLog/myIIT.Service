@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Media } from "../Files/media.entity";
+import { NewsAggregator } from "./news-aggregator.entity";
 
 @Entity()
 export class News {
@@ -21,4 +22,8 @@ export class News {
 
   @Column({ nullable: true })
   views: number;
+
+  @ManyToOne(() => NewsAggregator, (newsAggregator) => newsAggregator.news)
+  @JoinColumn()
+  newsAggregator: NewsAggregator;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
-import { ProfileType } from "../../../common/enums/profileType.enum";
+import { ProfileType } from "../../../common/enums/users/profileType.enum";
 
 export class CreateProfileDto {
   @IsOptional()

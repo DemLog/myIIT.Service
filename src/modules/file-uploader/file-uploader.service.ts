@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { File } from "../../database/entities/Files/file.entity";
 import { Repository } from "typeorm";
 import { Media } from "../../database/entities/Files/media.entity";
 import { Express } from 'express'
 import { Profile } from "../../database/entities/users/profile.entity";
-import { MediaType } from "../../common/enums/mediaType.enum";
+import { MediaType } from "../../common/enums/files/mediaType.enum";
 
 @Injectable()
 export class FileUploaderService {
@@ -53,6 +53,6 @@ export class FileUploaderService {
       return MediaType.Audio;
     }
 
-    throw new Error('Unsupported media type');
+    throw new HttpException("Требуемый тип несоотвествует допустимым типам для медиа-файла", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
   }
 }

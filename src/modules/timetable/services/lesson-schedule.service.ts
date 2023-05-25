@@ -7,7 +7,7 @@ import { ResponseLessonScheduleDto } from "../dto/lessonSchedule/response-lesson
 import { LecturerTimetableService, SubjectTimetableService, TimeScheduleService } from "./";
 import { RoleService } from "../../role/role.service";
 import { UpdateLessonScheduleDto } from "../dto/lessonSchedule/update-lesson-schedule.dto";
-import { DayWeek } from "../../../common/enums/dayWeek.enum";
+import { DayWeek } from "../../../common/enums/timetable/dayWeek.enum";
 
 @Injectable()
 export class LessonScheduleService {

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { SubjectType } from "../../../common/enums/subjectType.enum";
+import { SubjectType } from "../../../common/enums/timetable/subjectType.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity({name: "subject"})

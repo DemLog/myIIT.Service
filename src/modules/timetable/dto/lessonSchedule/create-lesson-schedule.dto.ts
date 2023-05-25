@@ -1,4 +1,4 @@
-import { DayWeek } from "../../../../common/enums/dayWeek.enum";
+import { DayWeek } from "../../../../common/enums/timetable/dayWeek.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateLessonScheduleDto {

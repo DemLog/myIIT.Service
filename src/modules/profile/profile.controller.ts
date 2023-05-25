@@ -6,7 +6,7 @@ import { CreateProfileDto } from "./dto/create-profile.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ResponseProfileDto } from "./dto/response-profile.dto";
 import { RoleIdDto } from "./dto/role-id.dto";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 import { Permissions } from "../../common/decorators/permissions.decorator";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { CurrentUserPermissions } from "../../common/decorators/current-user-permissions.decorator";
