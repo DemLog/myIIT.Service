@@ -15,6 +15,7 @@ import { redisStore } from "cache-manager-redis-yet";
 import { RolesGuard } from "./common/guards/roles.guard";
 import { TimetableModule } from './modules/timetable/timetable.module';
 import { NewsModule } from './modules/news/news.module';
+import { FileUploaderModule } from './modules/file-uploader/file-uploader.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { NewsModule } from './modules/news/news.module';
       isGlobal: true
     }),
     TimetableModule,
-    NewsModule
+    NewsModule,
+    FileUploaderModule
   ],
   controllers: [],
   providers: [
