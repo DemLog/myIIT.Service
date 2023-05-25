@@ -1,15 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne } from "typeorm";
 import { MediaType } from "../../../common/enums/mediaType.enum";
 import { News } from "../news/news.entity";
+import { File } from "./file.entity";
 
 @Entity()
-export class Media {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  url: string;
-
+export class Media extends File{
   @Column({
     type: 'enum',
     enum: MediaType,
