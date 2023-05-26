@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 import { RolePermission } from "../entities/users/role-permission.entity";
 
 export default class RolePermissionsCreateSeeder {

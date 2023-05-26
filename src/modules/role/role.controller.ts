@@ -8,7 +8,7 @@ import { PermissionsRoleIdDto } from "./dto/permissions-role-id.dto";
 import { RolePermissionDto } from "./dto/role-permission.dto";
 import { RoleListDto } from "./dto/role-list.dto";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 
 @ApiTags('roles')
 @ApiBearerAuth()

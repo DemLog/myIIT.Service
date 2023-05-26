@@ -5,7 +5,7 @@ import { AuthService } from "./auth.service";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { Public } from "../../common/decorators/public.decorator";
 import { Permissions } from "../../common/decorators/permissions.decorator";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 
 @ApiTags('auth')
 @Controller('auth')

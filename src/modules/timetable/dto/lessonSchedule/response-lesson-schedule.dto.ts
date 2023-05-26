@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { ResponseSubjectDto } from "../subject/response-subject.dto";
 import { RoleListDto } from "../../../role/dto/role-list.dto";
 import { ResponseLecturerDto } from "../lecturer/response-lecturer.dto";
-import { DayWeek } from "../../../../common/enums/dayWeek.enum";
+import { DayWeek } from "../../../../common/enums/timetable/dayWeek.enum";
 import { ResponseTimeScheduleDto } from "../timeSchedule/response-time-schedule.dto";
 
 export class ResponseLessonScheduleDto {

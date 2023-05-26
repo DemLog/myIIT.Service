@@ -11,7 +11,7 @@ import { PermissionsRoleIdDto } from "./dto/permissions-role-id.dto";
 import { RoleListDto } from "./dto/role-list.dto";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
-import { defaultStudyGroupPermissions } from "../../common/enums/permission.enum";
+import { defaultStudyGroupPermissions } from "../../common/enums/users/permission.enum";
 
 @Injectable()
 export class RoleService {

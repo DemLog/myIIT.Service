@@ -16,6 +16,8 @@ import { RolesGuard } from "./common/guards/roles.guard";
 import { TimetableModule } from './modules/timetable/timetable.module';
 import { NewsModule } from './modules/news/news.module';
 import { FileUploaderModule } from './modules/file-uploader/file-uploader.module';
+import { ServeStaticModule } from "@nestjs/serve-static";
+import * as path from "path";
 
 @Module({
   imports: [
@@ -41,7 +43,11 @@ import { FileUploaderModule } from './modules/file-uploader/file-uploader.module
     }),
     TimetableModule,
     NewsModule,
-    FileUploaderModule
+    FileUploaderModule,
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, 'uploads'),
+      serveRoot: '/uploads',
+    }),
   ],
   controllers: [],
   providers: [

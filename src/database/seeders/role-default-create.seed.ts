@@ -1,5 +1,5 @@
 import { DataSource, In } from "typeorm";
-import { PermissionDefault } from "../../common/enums/permission.enum";
+import { PermissionDefault } from "../../common/enums/users/permission.enum";
 import { Role } from "../entities/users/role.entity";
 import { RolePermission } from "../entities/users/role-permission.entity";
 
