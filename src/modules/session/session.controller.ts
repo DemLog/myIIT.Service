@@ -10,10 +10,10 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Profile } from "../../database/entities/users/profile.entity";
 import { CurrentUserPermissions } from "../../common/decorators/current-user-permissions.decorator";
 
-@ApiTags("sessions")
+@ApiTags("Sessions")
 @ApiBearerAuth()
 @Permissions(PermissionDefault.SESSION_ALL)
-@Controller("sessions")
+@Controller()
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {
   }
@@ -22,7 +22,7 @@ export class SessionController {
   @ApiOkResponse({ type: ResponseCreateSessionDto })
   @ApiResponse({ status: 400, description: "Некорректные данные для создания сессии" })
   @Permissions(PermissionDefault.SESSION_CREATE)
-  @Post()
+  @Post("session.createSession")
   async createSession(@Body() createSessionDto: CreateSessionDto): Promise<ResponseCreateSessionDto> {
     return await this.sessionService.createSession(createSessionDto);
   }
@@ -31,7 +31,7 @@ export class SessionController {
   @ApiResponse({ status: 200, description: "Сессия удалена" })
   @ApiResponse({ status: 404, description: "Сессия не найдена" })
   @Permissions(PermissionDefault.SESSION_DELETE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
-  @Post("logout")
+  @Post("session.logoutSession")
   async removeSession(
     @Query("sessionId") sessionId: number,
     @CurrentUser() currentUser: Profile,
@@ -50,7 +50,7 @@ export class SessionController {
   @ApiResponse({ status: 404, description: "Пользователь не найден" })
   @ApiQuery({name: "profileId", type: Number, required: false, allowEmptyValue: true})
   @Permissions(PermissionDefault.SESSION_DELETE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
-  @Delete()
+  @Delete("session.logoutSessionAll")
   async removeAllSessions(
     @Query("profileId") profileId: number,
     @CurrentUser() currentUser: Profile,
@@ -73,7 +73,7 @@ export class SessionController {
   @ApiResponse({ status: 404, description: "Пользователь не найден" })
   @ApiQuery({name: "profileId", type: Number, required: false, allowEmptyValue: true})
   @Permissions(PermissionDefault.SESSION_READ, PermissionDefault.SESSION_READ_UPDATE, PermissionDefault.SESSION_READ_UPDATE_DELETE)
-  @Get()
+  @Get("session.getSessionAll")
   async getAllSessions(
     @Query("profileId") profileId: number,
     @CurrentUser() currentUser: Profile,

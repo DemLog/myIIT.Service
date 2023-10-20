@@ -7,13 +7,13 @@ import { Public } from "../../common/decorators/public.decorator";
 import { Permissions } from "../../common/decorators/permissions.decorator";
 import { PermissionDefault } from "../../common/enums/users/permission.enum";
 
-@ApiTags('auth')
-@Controller('auth')
+@ApiTags('Auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
-  @Post('login')
+  @Post('auth.login')
   @ApiOperation({ summary: 'Аутентификация пользователя' })
   async login(
     @Body() loginDto: LoginDto,
@@ -26,7 +26,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @Permissions(PermissionDefault.AUTH_CREATE)
-  @Post('login/save')
+  @Post('auth.savePassword')
   @ApiOperation({ summary: 'Сохранение пароля пользователя' })
   async savePassword(
     @Body() loginDto: LoginDto,

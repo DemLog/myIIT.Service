@@ -11,10 +11,10 @@ import { Permissions } from "../../common/decorators/permissions.decorator";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { CurrentUserPermissions } from "../../common/decorators/current-user-permissions.decorator";
 
-@ApiTags("profiles")
+@ApiTags("Profiles")
 @ApiBearerAuth()
 @Permissions(PermissionDefault.PROFILE_ALL)
-@Controller("profiles")
+@Controller()
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {
   }
@@ -23,8 +23,8 @@ export class ProfileController {
   @ApiBody({ type: RoleIdDto })
   @ApiResponse({ status: 200 })
   @Permissions(PermissionDefault.ROLE_ALL)
-  @Post(":id/role")
-  async addProfileToRole(@Param("id") id: number, @Body() roleIdDto: RoleIdDto) {
+  @Post("profile.addUserRole")
+  async addProfileToRole(@Query("id") id: number, @Body() roleIdDto: RoleIdDto) {
     return this.profileService.addProfileToRole(id, roleIdDto);
   }
 
@@ -32,15 +32,15 @@ export class ProfileController {
   @ApiBody({ type: RoleIdDto })
   @ApiResponse({ status: 204 })
   @Permissions(PermissionDefault.ROLE_ALL)
-  @Delete(":id/role")
-  async removeProfileFromRole(@Param("id") id: number, @Body() roleIdDto: RoleIdDto) {
+  @Delete("profile.removeUserRole")
+  async removeProfileFromRole(@Query("id") id: number, @Body() roleIdDto: RoleIdDto) {
     return this.profileService.removeProfileFromRole(id, roleIdDto);
   }
 
   @ApiOperation({ summary: "Получить все профили" })
   @ApiResponse({ status: 200, type: [ResponseProfileDto] })
   @Permissions(PermissionDefault.PROFILE_READ, PermissionDefault.PROFILE_READ_UPDATE)
-  @Get("/all")
+  @Get("profile.getUserAll")
   async findAll(): Promise<ResponseProfileDto[]> {
     return this.profileService.findAll();
   }
@@ -49,7 +49,7 @@ export class ProfileController {
   @ApiQuery({ name: "q", type: String })
   @ApiResponse({ status: 200, type: [ResponseProfileDto] })
   @Permissions(PermissionDefault.PROFILE_READ)
-  @Get("search")
+  @Get("profile.searchUser")
   async search(@Query("q") q: string): Promise<ResponseProfileDto[]> {
     return this.profileService.search(q);
   }
@@ -58,8 +58,8 @@ export class ProfileController {
   @ApiParam({ name: "id", type: Number, required: false, allowEmptyValue: true })
   @ApiResponse({ status: 200, type: ResponseProfileDto })
   @Permissions(PermissionDefault.PROFILE_READ, PermissionDefault.PROFILE_READ_UPDATE)
-  @Get(":id?")
-  async findOne(@Param("id") id: number, @CurrentUser() currentUser: Profile): Promise<ResponseProfileDto> {
+  @Get("profile.getUser")
+  async findOne(@Query("id") id: number, @CurrentUser() currentUser: Profile): Promise<ResponseProfileDto> {
     if (!id) {
       id = currentUser.id;
     }
@@ -70,7 +70,7 @@ export class ProfileController {
   @ApiBody({ type: CreateProfileDto })
   @ApiResponse({ status: 201, type: Profile })
   @Permissions(PermissionDefault.PROFILE_CREATE)
-  @Post()
+  @Post("profile.createUser")
   async create(@Body() createProfileDto: CreateProfileDto): Promise<Profile> {
     return this.profileService.create(createProfileDto);
   }
@@ -80,8 +80,8 @@ export class ProfileController {
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({ status: 200, type: ResponseProfileDto })
   @Permissions(PermissionDefault.PROFILE_UPDATE, PermissionDefault.PROFILE_READ_UPDATE, PermissionDefault.PROFILE_READ_UPDATE_DELETE)
-  @Put(":id?")
-  async update(@Param("id") id: number,
+  @Put("profile.editUser")
+  async update(@Query("id") id: number,
                @Body() updateProfileDto: UpdateProfileDto,
                @CurrentUser() currentUser: Profile,
                @CurrentUserPermissions() currentUserPermissions: string[]
@@ -102,8 +102,8 @@ export class ProfileController {
   @ApiParam({ name: "id", type: Number })
   @ApiResponse({ status: 204 })
   @Permissions(PermissionDefault.PROFILE_DELETE, PermissionDefault.PROFILE_READ_UPDATE_DELETE)
-  @Delete(":id")
-  async remove(@Param("id") id: number): Promise<void> {
+  @Delete("profile.deleteUser")
+  async remove(@Query("id") id: number): Promise<void> {
     return this.profileService.remove(id);
   }
 

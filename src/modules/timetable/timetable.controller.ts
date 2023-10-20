@@ -7,9 +7,9 @@ import { Profile } from "../../database/entities/users/profile.entity";
 
 const STUDENT_GROUPS = ["ПрИ", "БИ", "ПИ"];
 
-@ApiTags('timetable')
+@ApiTags('Timetable')
 @ApiBearerAuth()
-@Controller('timetable')
+@Controller()
 export class TimetableController {
   constructor(
     private readonly lessonScheduleService: LessonScheduleService
@@ -30,7 +30,7 @@ export class TimetableController {
   @ApiOperation({ summary: 'Получить расписание на сегодня для группы' })
   @ApiResponse({ status: 200, description: 'Успешно', type: [ResponseLessonScheduleDto] })
   @ApiQuery({ name: "group", type: String, required: false, allowEmptyValue: true })
-  @Get('today')
+  @Get('timetable.getTimetableToday')
   async getTodayScheduleForGroup(
     @Query('group') groupName: string,
     @CurrentUser() currentUser: Profile
@@ -46,7 +46,7 @@ export class TimetableController {
   @ApiResponse({ status: 200, description: 'Успешно', type: [ResponseLessonScheduleDto] })
   @ApiQuery({ name: "group", type: String, required: false, allowEmptyValue: true })
   @ApiQuery({ name: "is-even-week", type: Boolean, required: false, allowEmptyValue: true })
-  @Get('weekly')
+  @Get('timetable.getTimetableWeek')
   async getWeeklyScheduleForGroup(
     @Query('group') groupName: string,
     @Query('is-even-week') isEvenWeek: boolean,

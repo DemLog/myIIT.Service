@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Put, Query,
   UploadedFile,
   UploadedFiles,
   UseInterceptors
@@ -22,7 +22,7 @@ import { UpdateNewsDto } from "./dto/update-news.dto";
 
 @ApiBearerAuth()
 @ApiTags('News')
-@Controller('news')
+@Controller()
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
@@ -30,7 +30,7 @@ export class NewsController {
   @ApiResponse({ status: 201, description: 'Новостной агрегатор успешно создан', type: ResponseNewsAggregatorDto })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
-  @Post('aggregator')
+  @Post('news.createChannel')
   async createNewsAggregator(
     @Body() createNewsAggregatorDto: CreateNewsAggregatorDto,
     @UploadedFile() image?: Express.Multer.File,
@@ -41,15 +41,15 @@ export class NewsController {
 
   @ApiOperation({ summary: 'Получить все новостные агрегаторы' })
   @ApiResponse({ status: 200, description: 'Список всех новостных агрегаторов', type: ResponseNewsAggregatorDto, isArray: true })
-  @Get('aggregator')
+  @Get('news.getChannelAll')
   async findAllNewsAggregators(): Promise<ResponseNewsAggregatorDto[]> {
     return this.newsService.findAllNewsAggregator();
   }
 
   @ApiOperation({ summary: 'Получить новостной агрегатор по ID' })
   @ApiResponse({ status: 200, description: 'Новостной агрегатор', type: ResponseNewsAggregatorDto })
-  @Get('aggregator/:id')
-  async findOneNewsAggregator(@Param('id') id: number): Promise<ResponseNewsAggregatorDto> {
+  @Get('news.getChannel')
+  async findOneNewsAggregator(@Query('id') id: number): Promise<ResponseNewsAggregatorDto> {
     return this.newsService.findOneNewsAggregator(id);
   }
 
@@ -57,9 +57,9 @@ export class NewsController {
   @ApiResponse({ status: 200, description: 'Новостной агрегатор успешно обновлен', type: ResponseNewsAggregatorDto })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
-  @Put('aggregator/:id')
+  @Put('news.editChannel')
   async updateNewsAggregator(
-    @Param('id') id: number,
+    @Query('id') id: number,
     @Body() updateNewsAggregatorDto: UpdateNewsAggregatorDto,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<ResponseNewsAggregatorDto> {
@@ -69,8 +69,8 @@ export class NewsController {
 
   @ApiOperation({ summary: 'Удалить новостной агрегатор' })
   @ApiResponse({ status: 204, description: 'Новостной агрегатор успешно удален' })
-  @Delete('aggregator/:id')
-  async removeNewsAggregator(@Param('id') id: number): Promise<void> {
+  @Delete('news.deleteChannel')
+  async removeNewsAggregator(@Query('id') id: number): Promise<void> {
     return this.newsService.removeNewsAggregator(id);
   }
 
@@ -78,7 +78,7 @@ export class NewsController {
   @ApiResponse({ status: 201, description: 'Новость успешно создана', type: ResponseNewsDto })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FilesInterceptor('media'))
-  @Post()
+  @Post("news.addPost")
   async createNews(
     @Body() createNewsDto: CreateNewsDto,
     @UploadedFiles() files: Express.Multer.File[],
@@ -89,15 +89,15 @@ export class NewsController {
 
   @ApiOperation({ summary: 'Получить все новости' })
   @ApiResponse({ status: 200, description: 'Список новостей', type: ResponseNewsDto })
-  @Get()
+  @Get("news.getPostAll")
   async findAllNews(): Promise<ResponseNewsDto[]> {
     return this.newsService.findAllNews();
   }
 
   @ApiOperation({ summary: 'Получить новость по ID' })
   @ApiResponse({ status: 200, description: 'Новость', type: ResponseNewsDto })
-  @Get(':id')
-  async findOneNews(@Param('id') id: number): Promise<ResponseNewsDto> {
+  @Get('news.getPost')
+  async findOneNews(@Query('id') id: number): Promise<ResponseNewsDto> {
     return this.newsService.findOneNews(id);
   }
 
@@ -105,9 +105,9 @@ export class NewsController {
   @ApiResponse({ status: 200, description: 'Новость успешно обновлена', type: ResponseNewsDto })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FilesInterceptor('media'))
-  @Put(':id')
+  @Put('news.editPost')
   async updateNews(
-    @Param('id') id: number,
+    @Query('id') id: number,
     @Body() updateNewsDto: UpdateNewsDto,
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<ResponseNewsDto> {
@@ -117,8 +117,8 @@ export class NewsController {
 
   @ApiOperation({ summary: 'Удалить новость' })
   @ApiResponse({ status: 200, description: 'Новость успешно удалена' })
-  @Delete(':id')
-  async removeNews(@Param('id') id: number): Promise<void> {
+  @Delete('news.deletePost')
+  async removeNews(@Query('id') id: number): Promise<void> {
     return this.newsService.removeNews(id);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { RoleService } from "./role.service";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateRolePermissionDto } from "./dto/create-role-permission.dto";
@@ -10,17 +10,17 @@ import { RoleListDto } from "./dto/role-list.dto";
 import { Permissions } from "../../common/decorators/permissions.decorator";
 import { PermissionDefault } from "../../common/enums/users/permission.enum";
 
-@ApiTags('roles')
+@ApiTags('Roles')
 @ApiBearerAuth()
 @Permissions(PermissionDefault.ROLE_ALL)
-@Controller('roles')
+@Controller()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @ApiOperation({ summary: 'Создать привелегию' })
   @ApiResponse({ status: 201, description: 'Успешно', type: RolePermissionDto })
   @Permissions(PermissionDefault.ROLE_PERMISSION_CREATE)
-  @Post('permissions')
+  @Post('role.createPermission')
   async createRolePermission(
     @Body() createRolePermissionDto: CreateRolePermissionDto): Promise<RolePermissionDto> {
     return this.roleService.createRolePermission(createRolePermissionDto);
@@ -33,7 +33,7 @@ export class RoleController {
     PermissionDefault.ROLE_PERMISSION_READ_UPDATE,
     PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
-  @Get('permissions')
+  @Get('role.getPermissionAll')
   async getAllRolePermissions(): Promise<RolePermissionDto[]> {
     return this.roleService.getAllRolePermissions();
   }
@@ -45,8 +45,8 @@ export class RoleController {
     PermissionDefault.ROLE_PERMISSION_READ_UPDATE,
     PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
-  @Get('permissions/:id')
-  async getRolePermissionById(@Param('id') id: number): Promise<RolePermissionDto> {
+  @Get('role.getPermission')
+  async getRolePermissionById(@Query('id') id: number): Promise<RolePermissionDto> {
     return this.roleService.findRolePermissionById(id);
   }
 
@@ -63,8 +63,8 @@ export class RoleController {
     PermissionDefault.ROLE_PERMISSION_DELETE,
     PermissionDefault.ROLE_PERMISSION_READ_UPDATE_DELETE,
   )
-  @Delete('permissions/:id')
-  async deleteRolePermission(@Param('id') id: number): Promise<void> {
+  @Delete('role.deletePermission')
+  async deleteRolePermission(@Query('id') id: number): Promise<void> {
     return this.roleService.deleteRolePermission(id);
   }
 
@@ -75,9 +75,9 @@ export class RoleController {
     PermissionDefault.ROLE_READ_UPDATE,
     PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
-  @Post(':id/permissions')
+  @Post('role.addRolePermissions')
   async addRolePermission(
-    @Param('id') roleId: number,
+    @Query('id') roleId: number,
     @Body() addPermissionsRoleDto: PermissionsRoleIdDto,
   ): Promise<RoleDto> {
     return this.roleService.addRolePermission(roleId, addPermissionsRoleDto);
@@ -90,9 +90,9 @@ export class RoleController {
     PermissionDefault.ROLE_READ_UPDATE,
     PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
-  @Delete(':id/permissions')
+  @Delete('role.deleteRolePermissions')
   async removeRolePermissionFromRole(
-    @Param('id') roleId: number,
+    @Query('id') roleId: number,
     @Body() removePermissionsRoleDto: PermissionsRoleIdDto,
   ): Promise<RoleDto> {
     return this.roleService.removeRolePermissionFromRole(roleId, removePermissionsRoleDto);
@@ -103,7 +103,7 @@ export class RoleController {
   @Permissions(
     PermissionDefault.ROLE_CREATE
   )
-  @Post()
+  @Post("role.createRole")
   async createRole(@Body() createRoleDto: CreateRoleDto): Promise<RoleDto> {
     return this.roleService.createRole(createRoleDto);
   }
@@ -115,7 +115,7 @@ export class RoleController {
     PermissionDefault.ROLE_READ_UPDATE,
     PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
-  @Get()
+  @Get("role.getRoleAll")
   async getAllRoles(): Promise<RoleListDto[]> {
     return this.roleService.getAllRoles();
   }
@@ -127,8 +127,8 @@ export class RoleController {
     PermissionDefault.ROLE_READ_UPDATE,
     PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
-  @Get(':id')
-  async getRoleById(@Param('id') id: number): Promise<RoleDto> {
+  @Get('role.getRole')
+  async getRoleById(@Query('id') id: number): Promise<RoleDto> {
     return this.roleService.findRoleById(id);
   }
 
@@ -145,8 +145,8 @@ export class RoleController {
     PermissionDefault.ROLE_DELETE,
     PermissionDefault.ROLE_READ_UPDATE_DELETE,
   )
-  @Delete(':id')
-  async deleteRole(@Param('id') id: number): Promise<void> {
+  @Delete('role.deleteRole')
+  async deleteRole(@Query('id') id: number): Promise<void> {
     return this.roleService.deleteRole(id);
   }
 }
