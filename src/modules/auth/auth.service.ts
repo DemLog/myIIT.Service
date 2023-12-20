@@ -99,7 +99,7 @@ export class AuthService {
   }
 
   private async fetchMoodleUserProfile(loginDto: LoginDto): Promise<IUserProfileMoodle> {
-    const url = "https://moodle.myiit.online/";
+    const url = "http://localhost:5000/";
     const params = { username: loginDto.login, password: loginDto.password };
 
     try {

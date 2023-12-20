@@ -7,9 +7,10 @@ import { RoleModule } from "../../role/role.module";
 import { LecturerTimetableModule } from "./lecturer-timetable.module";
 import { SubjectTimetableModule } from "./subject-timetable.module";
 import { TimeScheduleModule } from "./time-schedule.module";
+import { NotificationModule } from '../../notification/notification.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LessonSchedule]), RoleModule, LecturerTimetableModule, SubjectTimetableModule, TimeScheduleModule],
+  imports: [TypeOrmModule.forFeature([LessonSchedule]), RoleModule, LecturerTimetableModule, SubjectTimetableModule, TimeScheduleModule, NotificationModule],
   controllers: [LessonScheduleController],
   providers: [LessonScheduleService],
   exports: [LessonScheduleService]

@@ -17,7 +17,9 @@ import { TimetableModule } from './modules/timetable/timetable.module';
 import { NewsModule } from './modules/news/news.module';
 import { FileUploaderModule } from './modules/file-uploader/file-uploader.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
+import { NotificationModule } from './modules/notification/notification.module';
 import * as path from "path";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -48,6 +50,7 @@ import * as path from "path";
       rootPath: path.join(__dirname, 'uploads'),
       serveRoot: '/uploads',
     }),
+    NotificationModule,
   ],
   controllers: [],
   providers: [
@@ -67,7 +70,7 @@ import * as path from "path";
       provide: APP_GUARD,
       useClass: RolesGuard
     }
-  ],
+  ]
 })
 export class AppModule {
 }

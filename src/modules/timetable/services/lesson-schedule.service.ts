@@ -8,6 +8,9 @@ import { LecturerTimetableService, SubjectTimetableService, TimeScheduleService 
 import { RoleService } from "../../role/role.service";
 import { UpdateLessonScheduleDto } from "../dto/lessonSchedule/update-lesson-schedule.dto";
 import { DayWeek } from "../../../common/enums/timetable/dayWeek.enum";
+import { NotificationService } from "../../notification/notification.service";
+import { NotificationLevel } from "src/common/enums/notification/notificationLevel.enum";
+import { RecipientType } from "src/common/enums/notification/recipientType.enum";
 
 @Injectable()
 export class LessonScheduleService {
@@ -17,7 +20,8 @@ export class LessonScheduleService {
     private readonly lectureService: LecturerTimetableService,
     private readonly subjectService: SubjectTimetableService,
     private readonly timeScheduleService: TimeScheduleService,
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
+    private readonly notificationService: NotificationService
   ) {
   }
 
@@ -42,8 +46,18 @@ export class LessonScheduleService {
       dayWeek: createLessonScheduleDto.dayWeek,
       time: timeSchedule
     });
+    const lesson = await this.lessonScheduleRepository.save(createLessonSchedule);
 
-    return this.lessonScheduleRepository.save(createLessonSchedule);
+    this.notificationService.create({
+      title: `Добавлено новое занятие ${lesson.subject.title}`,
+      description: `Дисциплина ${lesson.subject.title} будет проходит в ${lesson.dayWeek}, ${lesson.time.id} парой, ${lesson.isEvenWeek ? "второй" : "первой"} недели`,
+      level: NotificationLevel.Info,
+      service: "Расписание",
+      recipientType: RecipientType.Group,
+      recipientId: lesson.groups[0].id
+    });
+
+    return lesson;
   }
 
   async getLessonSchedule(id: number): Promise<LessonSchedule> {
@@ -91,7 +105,18 @@ export class LessonScheduleService {
       lessonSchedule.groups = await Promise.all(updateLessonScheduleDto.groups.map(id => this.roleService.getRole(id)));
     }
 
-    return this.lessonScheduleRepository.save(lessonSchedule);
+    const lesson = await this.lessonScheduleRepository.save(lessonSchedule);
+
+    this.notificationService.create({
+      title: `Изменено занятие ${lessonSchedule.subject.title}`,
+      description: `Дисциплина ${lessonSchedule.subject.title} будет проходит в ${lesson.dayWeek}, ${lesson.time.id} парой, ${lesson.isEvenWeek ? "второй" : "первой"} недели`,
+      level: NotificationLevel.Info,
+      service: "Расписание",
+      recipientType: RecipientType.Group,
+      recipientId: lesson.groups[0].id
+    });
+
+    return lesson;
   }
 
   async getTodayScheduleForGroup(userGroup: string): Promise<ResponseLessonScheduleDto[]> {

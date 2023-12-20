@@ -39,6 +39,14 @@ export class ProfileService {
     return profile;
   }
 
+  async getProfilesInGroup(groupId: number): Promise<Profile[]> {
+    return this.profileRepository
+      .createQueryBuilder('profile')
+      .leftJoinAndSelect('profile.roles', 'role')
+      .where('role.id = :groupId', { groupId })
+      .getMany();
+  }
+
   async create(createProfileDto: CreateProfileDto): Promise<Profile> {
     const profile = this.profileRepository.create(createProfileDto);
     return this.profileRepository.save(profile);
