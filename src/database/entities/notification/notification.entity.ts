@@ -1,12 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { NotificationLevel } from "../../../common/enums/notification/notificationLevel.enum";
 import { RecipientType } from "../../../common/enums/notification/recipientType.enum";
 
-@Entity({name: "notification"})
-export class Notification {
+@Entity({ name: "notification" })
+export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn()
-  @ApiProperty({ description: 'Уникальный идентификатор уведомления'})
+  @ApiProperty({ description: 'Уникальный идентификатор уведомления' })
   id: number;
 
   @Column({ name: 'level', default: NotificationLevel.Info, type: 'enum', enum: NotificationLevel })
@@ -25,8 +25,8 @@ export class Notification {
   @ApiProperty({ description: 'Описание уведомления' })
   description: string;
 
-  @Column({ name: 'time' })
-  @ApiProperty({ description: 'Время уведомления' })
+  @CreateDateColumn({ name: 'time' })
+  @ApiProperty({ description: 'Время уведомления', type: () => Date })
   time: Date;
 
   @Column({ name: 'service' })
@@ -44,4 +44,8 @@ export class Notification {
   @Column({ name: 'recipient_id', nullable: true })
   @ApiProperty({ description: 'Идентификатор получателя (пользователя или группы), если применимо' })
   recipientId: number;
+
+  @Column({ name: 'is_read', default: false })
+  @ApiProperty({ description: 'Прочитано уведомление?' })
+  isRead: boolean;
 }

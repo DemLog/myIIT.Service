@@ -5,7 +5,7 @@ import { In, Repository } from 'typeorm';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { ResponseNotificationDto } from './dto/response-notification.dto';
 import { ProfileService } from '../profile/profile.service';
-import { RecipientType } from 'src/common/enums/notification/recipientType.enum';
+import { RecipientType } from '../../common/enums/notification/recipientType.enum';
 import { NotificationGateway } from './notification.gateway';
 
 @Injectable()

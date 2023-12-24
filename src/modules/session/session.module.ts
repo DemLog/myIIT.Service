@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Session } from '../../database/entities/users/session.entity';
+import { Session } from '../../database/entities/session/session.entity';
 import { SessionController } from './session.controller';
 import { SessionService } from './session.service';
 import { ProfileModule } from "../profile/profile.module";

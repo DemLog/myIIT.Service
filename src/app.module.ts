@@ -13,13 +13,12 @@ import { JwtAuthGuard } from "./common/guards/jwt-auth.guard";
 import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-yet";
 import { RolesGuard } from "./common/guards/roles.guard";
-import { TimetableModule } from './modules/timetable/timetable.module';
-import { NewsModule } from './modules/news/news.module';
 import { FileUploaderModule } from './modules/file-uploader/file-uploader.module';
 import { ServeStaticModule } from "@nestjs/serve-static";
-import { NotificationModule } from './modules/notification/notification.module';
 import * as path from "path";
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { TimetableModule } from "./modules/timetable/timetable.module";
+import { NotificationModule } from "./modules/notification/notification.module";
+import AdminModule from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -31,7 +30,8 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: join(process.cwd(), "src", "config", "env", ".env.development")
-    }),
+    },
+    ),
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -44,13 +44,13 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
       isGlobal: true
     }),
     TimetableModule,
-    NewsModule,
     FileUploaderModule,
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, 'uploads'),
       serveRoot: '/uploads',
     }),
     NotificationModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [

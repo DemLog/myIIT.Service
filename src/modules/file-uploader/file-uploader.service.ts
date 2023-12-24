@@ -1,22 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { File } from "../../database/entities/Files/file.entity";
 import { Repository } from "typeorm";
-import { Media } from "../../database/entities/Files/media.entity";
-import { Express } from 'express'
-import { Profile } from "../../database/entities/users/profile.entity";
-import { MediaType } from "../../common/enums/files/mediaType.enum";
+import { MediaType } from "../../common/enums/file/mediaType.enum";
 import * as uuid from 'uuid';
 import * as path from "path";
 import * as fs from "fs";
+import { Profile } from "../../database/entities/profile/profile.entity";
+import { File } from "../../database/entities/file/file.entity";
+import { FileMedia } from "../../database/entities/file/file-media.entity";
+import { CreateFileMediaDto } from "./dto/create-file-media.dto";
 
 @Injectable()
 export class FileUploaderService {
   constructor(
     @InjectRepository(File)
     private readonly fileRepository: Repository<File>,
-    @InjectRepository(Media)
-    private readonly mediaRepository: Repository<Media>
+    @InjectRepository(FileMedia)
+    private readonly mediaRepository: Repository<FileMedia>
   ) {}
 
   async uploadFile(file: Express.Multer.File, author?: Profile): Promise<File> {
@@ -42,15 +42,17 @@ export class FileUploaderService {
     return this.fileRepository.save(savedFile);
   }
 
-  async uploadMedia(file: Express.Multer.File, createMediaDto: Partial<Media>, author?: Profile): Promise<Media> {
+  async uploadMedia(file: Express.Multer.File, createFileMediaDto: CreateFileMediaDto, author?: Profile): Promise<File> {
     const savedFile = await this.uploadFile(file, author || null);
-    createMediaDto.type = this.getMediaTypeByFileExtension(savedFile.filename);
+    const type = this.getMediaTypeByFileExtension(savedFile.filename);
 
     const savedMediaFile = this.mediaRepository.create({
       ...savedFile,
-      ...createMediaDto
+      ...createFileMediaDto,
+      type
     })
-    return this.mediaRepository.save(savedMediaFile);
+    await this.mediaRepository.save(savedMediaFile);
+    return savedFile;
   }
 
   private getMediaTypeByFileExtension(filename: string): MediaType {

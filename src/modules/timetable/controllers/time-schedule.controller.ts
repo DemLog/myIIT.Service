@@ -4,6 +4,7 @@ import { CreateTimeScheduleDto } from "../dto/timeSchedule/create-time-schedule.
 import { ResponseTimeScheduleDto } from "../dto/timeSchedule/response-time-schedule.dto";
 import { UpdateTimeScheduleDto } from "../dto/timeSchedule/update-time-schedule.dto";
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ResponseNowTimeSchedule } from "../dto/timeSchedule/response-now-time-schedule.dto";
 
 @ApiTags('Timetable: TimeSchedule')
 @ApiBearerAuth()
@@ -49,5 +50,12 @@ export class TimeScheduleController {
   @Delete('timetable.deleteTimeSchedule')
   async remove(@Query('id') id: number): Promise<void> {
     return this.timeScheduleService.remove(id);
+  }
+
+  @ApiOperation({ summary: 'Получить текущую пару' })
+  @ApiResponse({ status: 200, description: 'Успешно', type: ResponseNowTimeSchedule })
+  @Get('timetable.getNowTimeSchedule')
+  async getNow(): Promise<ResponseNowTimeSchedule> {
+    return this.timeScheduleService.getNowSchedule();
   }
 }

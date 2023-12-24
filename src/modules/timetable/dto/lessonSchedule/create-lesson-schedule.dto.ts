@@ -1,3 +1,4 @@
+import { Subgroup } from "../../../../common/enums/timetable/subgroup.enum";
 import { DayWeek } from "../../../../common/enums/timetable/dayWeek.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -19,6 +20,9 @@ export class CreateLessonScheduleDto {
 
   @ApiProperty({ description: "День недели", enum: DayWeek, default: DayWeek.Monday })
   dayWeek: DayWeek;
+
+  @ApiProperty({ description: 'Номер подруппы', enum: Subgroup, default: Subgroup.All })
+  subgroup: Subgroup;
 
   @ApiProperty({ description: "Время занятия" })
   time: number;

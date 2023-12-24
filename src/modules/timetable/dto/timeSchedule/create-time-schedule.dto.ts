@@ -4,9 +4,9 @@ export class CreateTimeScheduleDto {
   @ApiProperty({description: "Номер пары"})
   number: number;
 
-  @ApiProperty({description: "Время начала пары"})
-  startTime: string;
+  @ApiProperty({description: "Время начала пары", type: Date})
+  startTime: Date;
 
-  @ApiProperty({description: "Время конца занятия"})
-  endTime: string;
+  @ApiProperty({description: "Время конца занятия", type: Date})
+  endTime: Date;
 }

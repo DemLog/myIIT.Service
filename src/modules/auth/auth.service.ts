@@ -2,21 +2,25 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { ProfileService } from "../profile/profile.service";
 import { SessionService } from "../session/session.service";
 import { LoginDto } from "./dto/login.dto";
-import { User } from "../../database/entities/users/user.entity";
-import { ProfileType } from "../../common/enums/users/profileType.enum";
+import { ProfileType } from "../../common/enums/profile/profileType.enum";
 import axios from "axios";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ResponseLoginDto } from "./dto/response-login.dto";
 import { CreateProfileDto } from "../profile/dto/create-profile.dto";
 import { RoleService } from "../role/role.service";
-import { Role } from "../../database/entities/users/role.entity";
+import { Auth } from "../../database/entities/auth/auth.entity";
+import { Role } from "../../database/entities/role/role.entity";
+import { SavePasswordDto } from "./dto/save-password.dto";
+import { encryptData } from "../../utils/crypto/crypto.service";
+import { authSecretKey } from "../../config/secret.config";
+import { CreateProfileInfoDto } from "../profile/dto/create-profile-info.dto";
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(Auth)
+    private readonly userRepository: Repository<Auth>,
     private readonly profileService: ProfileService,
     private readonly sessionService: SessionService,
     private readonly roleService: RoleService
@@ -26,38 +30,55 @@ export class AuthService {
   async login(loginDto: LoginDto, ipAddress: string, userAgent: string): Promise<ResponseLoginDto> {
     let user = await this.findUserByLogin(loginDto.login);
 
-    if (user && user.moodleConsent && loginDto.password === user.password) {
-      const session = await this.sessionService.createSession({
-        deviceInfo: userAgent,
-        ipAddress,
-        profileId: user.profile.id
-      });
+    // if (user && user.moodleConsent && loginDto.password === user.password) {
+    //   const session = await this.sessionService.createSession({
+    //     deviceInfo: userAgent,
+    //     ipAddress,
+    //     profileId: user.profile.id
+    //   });
 
-      return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
-    }
+    //   return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
+    // }
 
     const moodleUserProfile = await this.fetchMoodleUserProfile(loginDto);
 
     if (!user) {
+      const profileTypeCheck = moodleUserProfile.studyGroup ? ProfileType.Student : ProfileType.Employee;
+
+      const userProfileInfo: CreateProfileInfoDto = {
+        studyGroup: moodleUserProfile.studyGroup,
+        studyDirection: moodleUserProfile.studyDirection,
+        studyProfile: moodleUserProfile.profile,
+        studyStatus: moodleUserProfile.status
+      };
+
       const userProfile: CreateProfileDto = {
         ...moodleUserProfile,
-        profileType: ProfileType.User
+        profileType: profileTypeCheck,
+        profileInfo: userProfileInfo
       };
 
       const createUserProfile = await this.profileService.create(userProfile);
+      console.log(createUserProfile);
       const userRole = await this.roleService.findRoleByName("Пользователь");
-      await this.profileService.addProfileToRole(createUserProfile.id, { roleId: userRole.id });
+      console.log(userRole);
+      await this.profileService.addProfileToRole({ id: createUserProfile.id, roleId: userRole.id });
 
-      if (createUserProfile.studyGroup) {
+      if (createUserProfile.profileInfo.studyGroup) {
         let studentRole: Role;
 
         try {
-          studentRole = await this.roleService.findRoleByName(createUserProfile.studyGroup);
+          studentRole = await this.roleService.findRoleByName(createUserProfile.profileInfo.studyGroup);
         } catch (e) {
-          studentRole = await this.roleService.createStudentRole(createUserProfile.studyGroup);
+          studentRole = await this.roleService.createStudentRole(createUserProfile.profileInfo.studyGroup);
         } finally {
-          await this.profileService.addProfileToRole(createUserProfile.id, { roleId: studentRole.id });
+          await this.profileService.addProfileToRole({ id: createUserProfile.id, roleId: studentRole.id });
         }
+      } else {
+        let teacherRole: Role;
+
+        teacherRole = await this.roleService.findRoleByName("Преподаватель");
+        await this.profileService.addProfileToRole({ id: createUserProfile.id, roleId: teacherRole.id });
       }
 
       const createUser = this.userRepository.create({
@@ -80,22 +101,28 @@ export class AuthService {
     return { token: session.token, moodleConsent: user.moodleConsent, userId: user.id };
   }
 
-  async savePassword(loginDto: LoginDto): Promise<void> {
-    await this.fetchMoodleUserProfile(loginDto);
+  async logout(token: string): Promise<void> {
+    await this.sessionService.removeSessionByToken(token);
+  }
 
-    const user = await this.findUserByLogin(loginDto.login);
+  async savePassword(savePasswordDto: SavePasswordDto): Promise<void> {
+    await this.fetchMoodleUserProfile(savePasswordDto);
+
+    const user = await this.findUserByLogin(savePasswordDto.login);
     if (user.password) {
       throw new HttpException("Пароль уже сохранен в системе", HttpStatus.BAD_REQUEST);
     }
 
+    const encryptedPassword = encryptData(savePasswordDto.password + savePasswordDto.pinCode, authSecretKey);
+
     await this.userRepository.update(user.id, {
-      password: loginDto.password,
+      password: encryptedPassword,
       moodleConsent: true
     });
   }
 
-  async getUser(id: number): Promise<User> {
-    return await this.userRepository.findOne({where: {id}, relations: {profile: true}});
+  async getUser(id: number): Promise<Auth> {
+    return await this.userRepository.findOne({ where: { id }, relations: { profile: true } });
   }
 
   private async fetchMoodleUserProfile(loginDto: LoginDto): Promise<IUserProfileMoodle> {
@@ -113,7 +140,7 @@ export class AuthService {
     }
   }
 
-  private async findUserByLogin(login: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { login }, relations: {profile: true}});
+  private async findUserByLogin(login: string): Promise<Auth | null> {
+    return this.userRepository.findOne({ where: { login }, relations: { profile: true } });
   }
 }

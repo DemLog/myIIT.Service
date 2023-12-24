@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TimeScheduleService } from "../services";
 import { TimeScheduleController } from "../controllers/time-schedule.controller";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { TimeSchedule } from "../../../database/entities/timetable/time-schedule.entity";
+import { TimetableSchedule } from "../../../database/entities/timetable/timetable-schedule.entity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TimeSchedule])],
+  imports: [TypeOrmModule.forFeature([TimetableSchedule])],
   controllers: [TimeScheduleController],
   providers: [TimeScheduleService],
   exports: [TimeScheduleService]

@@ -15,4 +15,7 @@ export class CreateLecturerDto {
 
   @ApiProperty({ description: 'Контакт преподавателя', nullable: true })
   contact?: string;
+
+  @ApiProperty({ description: 'Профиль преподавателя', nullable: true })
+  profile?: number;
 }

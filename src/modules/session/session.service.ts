@@ -3,12 +3,12 @@ import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateSessionDto } from "./dto/create-session.dto";
-import { Session } from "../../database/entities/users/session.entity";
 import { ProfileService } from "../profile/profile.service";
 import { ResponseCreateSessionDto } from "./dto/response-create-session.dto";
-import { SessionDto } from "./dto/session.dto";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
+import { Session } from "../../database/entities/session/session.entity";
+import { ResponseSessionDto } from "./dto/response-session.dto";
 
 @Injectable()
 export class SessionService {
@@ -32,7 +32,7 @@ export class SessionService {
   }
 
   async getSession(id: number): Promise<Session> {
-    const session = await this.sessionRepository.findOne({ where: { id } });
+    const session = await this.sessionRepository.findOne({ where: { id }, relations: {profile: true} });
     if (!session) {
       throw new HttpException("Сессия не найдена", HttpStatus.NOT_FOUND);
     }
@@ -46,7 +46,7 @@ export class SessionService {
   }
 
   async removeSessionByToken(token: string): Promise<void> {
-    const session = await this.sessionRepository.findOneBy({token});
+    const session = await this.sessionRepository.findOne({ where: { token }, relations: {profile: true} });
     if (!session) {
       throw new HttpException("Сессия не найдена", HttpStatus.NOT_FOUND);
     }
@@ -68,7 +68,7 @@ export class SessionService {
     await this.sessionRepository.delete({ profile: { id: profileId } });
   }
 
-  async getAllSessions(profileId: number): Promise<SessionDto[]> {
+  async getAllSessions(profileId: number): Promise<ResponseSessionDto[]> {
     const sessions = await this.sessionRepository.find({
       where: { profile: { id: profileId } },
       relations: { profile: true }

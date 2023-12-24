@@ -4,6 +4,7 @@ import { RoleListDto } from "../../../role/dto/role-list.dto";
 import { ResponseLecturerDto } from "../lecturer/response-lecturer.dto";
 import { DayWeek } from "../../../../common/enums/timetable/dayWeek.enum";
 import { ResponseTimeScheduleDto } from "../timeSchedule/response-time-schedule.dto";
+import { Subgroup } from "../../../../common/enums/timetable/subgroup.enum";
 
 export class ResponseLessonScheduleDto {
   @ApiProperty({ description: "Идентификатор роли" })
@@ -26,6 +27,9 @@ export class ResponseLessonScheduleDto {
 
   @ApiProperty({ description: 'День недели', enum: DayWeek, default: DayWeek.Monday })
   dayWeek: DayWeek;
+
+  @ApiProperty({ description: 'Номер подруппы', enum: Subgroup, default: Subgroup.All })
+  subgroup: Subgroup;
 
   @ApiProperty({ description: "Время занятия", type: () => ResponseTimeScheduleDto})
   time: ResponseTimeScheduleDto;

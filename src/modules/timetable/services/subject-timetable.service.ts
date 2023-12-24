@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Subject } from "../../../database/entities/timetable/subject.entity";
+import { TimetableSubject } from "../../../database/entities/timetable/timetable-subject.entity";
 import { Repository } from "typeorm";
 import { CreateSubjectDto } from "../dto/subject/create-subject.dto";
 import { UpdateSubjectDto } from "../dto/subject/update-subject.dto";
@@ -9,8 +9,8 @@ import { ResponseSubjectDto } from "../dto/subject/response-subject.dto";
 @Injectable()
 export class SubjectTimetableService {
   constructor(
-    @InjectRepository(Subject)
-    private readonly subjectRepository: Repository<Subject>
+    @InjectRepository(TimetableSubject)
+    private readonly subjectRepository: Repository<TimetableSubject>
   ) {}
 
   async create(createSubjectDto: CreateSubjectDto): Promise<ResponseSubjectDto> {
@@ -18,7 +18,7 @@ export class SubjectTimetableService {
     return this.subjectRepository.save(subject);
   }
 
-  async getSubject(id: number): Promise<Subject> {
+  async getSubject(id: number): Promise<TimetableSubject> {
     const subject = await this.subjectRepository.findOne({where: {id}});
     if (!subject) {
       throw new HttpException("Предмет не найден", HttpStatus.NOT_FOUND);

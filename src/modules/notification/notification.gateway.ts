@@ -2,7 +2,7 @@ import { SubscribeMessage, WebSocketGateway, OnGatewayInit, OnGatewayConnection,
 import { Server, Socket } from 'socket.io';
 import { NotificationService } from './notification.service';
 import { ResponseNotificationDto } from './dto/response-notification.dto';
-import { Profile } from "../../database/entities/users/profile.entity";
+import { Profile } from "../../database/entities/profile/profile.entity";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RecipientType } from 'src/common/enums/notification/recipientType.enum';
 import { UseGuards } from '@nestjs/common';
@@ -35,7 +35,7 @@ export class NotificationGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  @SubscribeMessage('subscribeToNotifications')
+  @SubscribeMessage('notification.subscribe')
   async handleSubscribeToNotifications(@ConnectedSocket() client: Socket, @CurrentUser() currentUser: Profile): Promise<void> {
     // Добавляем клиента в комнату "notifications" для отправки уведомлений только этому клиенту
     client.join(`notifications-${currentUser.id}`);
@@ -45,7 +45,7 @@ export class NotificationGateway implements OnGatewayInit, OnGatewayConnection, 
     this.connectedClients.set(client.id, currentUser);
   }
 
-  @SubscribeMessage('unsubscribeFromNotifications')
+  @SubscribeMessage('notification.unsubscribe')
   handleUnsubscribeFromNotifications(@ConnectedSocket() client: Socket): void {
     // Если клиент подписан на уведомления, удаляем его
     if (this.connectedClients.has(client.id)) {

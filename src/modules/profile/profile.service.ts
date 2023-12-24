@@ -1,26 +1,33 @@
-import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, UploadedFile } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Profile } from "../../database/entities/users/profile.entity";
 import { CreateProfileDto } from "./dto/create-profile.dto";
-import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { ResponseProfileDto } from "./dto/response-profile.dto";
 import { RoleService } from "../role/role.service";
-import { RoleIdDto } from "./dto/role-id.dto";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Cache } from "cache-manager";
+import { Profile } from "../../database/entities/profile/profile.entity";
+import { ProfileInfo } from "../../database/entities/profile/profile-info.entity";
+import { EditProfileDto } from "./dto/edit-profile.dto";
+import { AddRoleProfileDto } from "./dto/add-role-profile.dto";
+import { RemoveRoleProfileDto } from "./dto/remove-role-profile.dto";
+import { FileUploaderService } from "../file-uploader/file-uploader.service";
+import { ResponsePhotoProfileDto } from "./dto/response-photo-profile.dto";
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(ProfileInfo)
+    private readonly profileInfoRepository: Repository<ProfileInfo>,
     private readonly roleService: RoleService,
+    private readonly fileUploaderService: FileUploaderService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
-  ) {}
+  ) { }
 
   async findAll(): Promise<ResponseProfileDto[]> {
-    return this.profileRepository.find({relations: {roles: true}});
+    return this.profileRepository.find({ relations: { profileInfo: true, roles: true } });
   }
 
   async findOne(id: number): Promise<ResponseProfileDto> {
@@ -30,7 +37,7 @@ export class ProfileService {
   }
 
   async getProfile(id: number): Promise<Profile> {
-    const profile = await this.profileRepository.findOne({ where: { id }, relations: {roles: {permissions: true}} });
+    const profile = await this.profileRepository.findOne({ where: { id }, relations: { profileInfo: true, roles: { permissions: true } } });
     if (!profile) {
       throw new HttpException("Профиль не найден", HttpStatus.NOT_FOUND);
     }
@@ -48,11 +55,15 @@ export class ProfileService {
   }
 
   async create(createProfileDto: CreateProfileDto): Promise<Profile> {
-    const profile = this.profileRepository.create(createProfileDto);
+    const profileInfo = this.profileInfoRepository.create(createProfileDto.profileInfo);
+    const profile = this.profileRepository.create({
+      ...createProfileDto,
+      profileInfo
+    });
     return this.profileRepository.save(profile);
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto): Promise<ResponseProfileDto> {
+  async update(id: number, updateProfileDto: EditProfileDto): Promise<ResponseProfileDto> {
     const profile = await this.getProfile(id);
 
     await this.cacheManager.del(`profile_permissions:${id}`);
@@ -77,18 +88,27 @@ export class ProfileService {
       .getMany();
   }
 
-  async addProfileToRole(id: number, roleIdDto: RoleIdDto): Promise<void> {
-    const role = await this.roleService.getRole(roleIdDto.roleId);
-    const profile = await this.getProfile(id);
+  async addProfileToRole(addRoleProfileDto: AddRoleProfileDto): Promise<void> {
+    const role = await this.roleService.getRole(addRoleProfileDto.roleId);
+    const profile = await this.getProfile(addRoleProfileDto.id);
     profile.roles.push(role);
-    await this.cacheManager.del(`profile_permissions:${id}`);
+    await this.cacheManager.del(`profile_permissions:${addRoleProfileDto.id}`);
     await this.profileRepository.save(profile);
   }
 
-  async removeProfileFromRole(id: number, roleIdDto: RoleIdDto): Promise<void> {
-    const profile = await this.getProfile(id);
-    profile.roles = profile.roles.filter((r) => r.id !== roleIdDto.roleId);
-    await this.cacheManager.del(`profile_permissions:${id}`);
+  async removeProfileFromRole(removeRoleProfileDto: RemoveRoleProfileDto): Promise<void> {
+    const profile = await this.getProfile(removeRoleProfileDto.id);
+    profile.roles = profile.roles.filter((r) => r.id !== removeRoleProfileDto.roleId);
+    await this.cacheManager.del(`profile_permissions:${removeRoleProfileDto.id}`);
     await this.profileRepository.save(profile);
+  }
+
+  async uploadPhoto(@UploadedFile() file: Express.Multer.File, id: number): Promise<ResponsePhotoProfileDto> {
+    const profile = await this.getProfile(id);
+    const photo = await this.fileUploaderService.uploadMedia(file, {}, profile);
+
+    this.profileRepository.merge(profile, {avatar: photo.url});
+    await this.profileRepository.save(profile);
+    return { url: photo.url, profileId: profile.id }
   }
 }
