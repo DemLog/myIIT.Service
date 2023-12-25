@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn, BaseEntity } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, ManyToOne, JoinColumn, BaseEntity, OneToOne } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { ChatType } from "src/common/enums/messages/chatType.enum";
 import { Role } from "../role/role.entity";
 import { Profile } from "../profile/profile.entity";
+import { Message } from "./message.entity";
 
 @Entity({ name: 'message_chat' })
 export class MessageChat extends BaseEntity {
@@ -40,6 +41,11 @@ export class MessageChat extends BaseEntity {
   @Column({ name: 'avatar', nullable: true })
   @ApiProperty({ description: 'Ссылка на аватар беседы' })
   avatar: string;
+
+  @OneToOne(() => Message, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: "last_message_id" })
+  @ApiProperty({ type: () => Message, description: 'ID последнего сообщения' })
+  lastMessage: Message;
 
   @Column({ name: 'secret' })
   @ApiProperty({ description: 'Уникальный токен беседы' })

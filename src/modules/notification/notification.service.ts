@@ -52,7 +52,6 @@ export class NotificationService {
     });
 
     if (notification.recipientType === RecipientType.User) {
-      console.log(notification)
         const profile = await this.profileService.getProfile(notification.recipientId);
         await this.notificationGateway.emitNotifications(profile.id, notification);
     } else if (notification.recipientType === RecipientType.Group) {

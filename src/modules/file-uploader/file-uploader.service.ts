@@ -9,6 +9,9 @@ import { Profile } from "../../database/entities/profile/profile.entity";
 import { File } from "../../database/entities/file/file.entity";
 import { FileMedia } from "../../database/entities/file/file-media.entity";
 import { CreateFileMediaDto } from "./dto/create-file-media.dto";
+import { CreateAttachmentDto } from "./dto/create-attachment.dto";
+import { Attachment } from "../../database/entities/file/attachment.entity";
+import { AttachmentType } from "../../common/enums/file/attachmentType.enum";
 
 @Injectable()
 export class FileUploaderService {
@@ -16,8 +19,10 @@ export class FileUploaderService {
     @InjectRepository(File)
     private readonly fileRepository: Repository<File>,
     @InjectRepository(FileMedia)
-    private readonly mediaRepository: Repository<FileMedia>
-  ) {}
+    private readonly mediaRepository: Repository<FileMedia>,
+    @InjectRepository(Attachment)
+    private readonly attachmentRepository: Repository<Attachment>
+  ) { }
 
   async uploadFile(file: Express.Multer.File, author?: Profile): Promise<File> {
     const { originalname, mimetype, buffer, size } = file;
@@ -53,6 +58,33 @@ export class FileUploaderService {
     })
     await this.mediaRepository.save(savedMediaFile);
     return savedFile;
+  }
+
+  async uploadAttachment(file: Express.Multer.File, createAttachmentDto: CreateAttachmentDto, author?: Profile): Promise<Attachment> {
+    let newFile: File = null;
+    let savedAttachment: Attachment = null;
+
+    switch (createAttachmentDto.type) {
+      case AttachmentType.Music:
+      case AttachmentType.Photo:
+      case AttachmentType.Video:
+        newFile = await this.uploadMedia(file, createAttachmentDto.media, author);
+        savedAttachment = this.attachmentRepository.create({
+          type: createAttachmentDto.type,
+          media: newFile
+        })
+        break;
+      default:
+        newFile = await this.uploadFile(file, author);
+        savedAttachment = this.attachmentRepository.create({
+          type: createAttachmentDto.type,
+          file: newFile
+        })
+        break;
+    }
+
+    return this.attachmentRepository.save(savedAttachment);
+
   }
 
   private getMediaTypeByFileExtension(filename: string): MediaType {

@@ -59,9 +59,7 @@ export class AuthService {
       };
 
       const createUserProfile = await this.profileService.create(userProfile);
-      console.log(createUserProfile);
       const userRole = await this.roleService.findRoleByName("Пользователь");
-      console.log(userRole);
       await this.profileService.addProfileToRole({ id: createUserProfile.id, roleId: userRole.id });
 
       if (createUserProfile.profileInfo.studyGroup) {

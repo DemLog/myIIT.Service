@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, BaseEntity } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn, BaseEntity, OneToMany } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { EventType } from "src/common/enums/events/eventType.enum";
 import { Attachment } from "../file/attachment.entity";
+import { EventVote } from "./event-vote.entity";
 
 @Entity({ name: 'event' })
 export class Event extends BaseEntity {
@@ -29,10 +30,10 @@ export class Event extends BaseEntity {
   @ApiProperty({ description: 'Ссылка на мероприятие' })
   url: string;
 
-  @ManyToMany(() => Attachment, {cascade: true})
-  @JoinTable()
-  @ApiProperty({ type: () => [Attachment], description: 'Вложения' })
-  Attachments: Attachment[];
+  // @ManyToMany(() => Attachment, {cascade: true})
+  // @JoinTable()
+  // @ApiProperty({ type: () => [Attachment], description: 'Вложения' })
+  // Attachments: Attachment[];
 
   @Column({ name: 'date' })
   @ApiProperty({ description: 'Время начала мероприятия', type: () => Date })
@@ -46,11 +47,14 @@ export class Event extends BaseEntity {
   @ApiProperty({ description: 'Фотография мероприятия' })
   photo: string;
 
-  @Column({ name: 'geo', nullable: true, type: 'point' })
+  @Column({ name: 'geo', nullable: true })
   @ApiProperty({ description: 'Местоположение мероприятия' })
   geo: string;
 
   @Column({ name: 'geo_name', nullable: true })
   @ApiProperty({ description: 'Адрес мероприятия' })
   geoName: string;
+
+  @OneToMany(() => EventVote, (eventVote) => eventVote.event, { onDelete: "CASCADE" })
+  votes: EventVote[];
 }

@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, BaseEntity } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, BaseEntity, OneToOne } from "typeorm";
 import { ApiProperty } from '@nestjs/swagger';
 import { Profile } from "../profile/profile.entity";
+import { Message } from "./message.entity";
 
 @Entity({ name: 'message_feedback' })
 export class MessageFeedback extends BaseEntity {
@@ -20,6 +21,11 @@ export class MessageFeedback extends BaseEntity {
   @Column({ name: 'is_active', default: true })
   @ApiProperty({ description: 'Статус заявки' })
   isActive: boolean;
+
+  @OneToOne(() => Message, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: "last_message_id" })
+  @ApiProperty({ type: () => Message, description: 'ID последнего сообщения' })
+  lastMessage: Message;
 
   @Column({ name: 'secret' })
   @ApiProperty({ description: 'Уникальный токен заявки обратной связи' })

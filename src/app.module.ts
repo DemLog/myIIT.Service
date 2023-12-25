@@ -18,6 +18,8 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import * as path from "path";
 import { TimetableModule } from "./modules/timetable/timetable.module";
 import { NotificationModule } from "./modules/notification/notification.module";
+import { MessagesModule } from './modules/messages/messages.module';
+import { EventsModule } from './modules/events/events.module';
 import AdminModule from './modules/admin/admin.module';
 
 @Module({
@@ -51,6 +53,8 @@ import AdminModule from './modules/admin/admin.module';
     }),
     NotificationModule,
     AdminModule,
+    MessagesModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [

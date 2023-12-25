@@ -30,7 +30,7 @@ export class Message extends BaseEntity {
   @ManyToMany(() => Attachment, { cascade: true })
   @JoinTable()
   @ApiProperty({ type: () => [Attachment], description: 'Вложения' })
-  Attachments: Attachment[];
+  attachments: Attachment[];
 
   @ManyToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: "reply_message_id" })

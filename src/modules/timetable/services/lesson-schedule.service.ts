@@ -153,9 +153,9 @@ export class LessonScheduleService {
       const time: TimetableSchedule = {id: timeData.id, number: timeData.number, startTime: timeData.startTime, endTime: timeData.endTime} as TimetableSchedule;
       schedule = await this.lessonScheduleRepository.findOne({
         where: {
-          groups: Equal(group),
+          groups: {id: group.id},
           dayWeek: DayWeek[today],
-          time: Equal(time),
+          time: {id: time.id},
           isEvenWeek
         },
         relations: {
@@ -174,7 +174,7 @@ export class LessonScheduleService {
     const group = await this.roleService.findRoleByName(userGroup);
     return await this.lessonScheduleRepository.find({
       where: {
-        groups: Equal(group),
+        groups: {id: group.id},
         isEvenWeek
       },
       relations: {
